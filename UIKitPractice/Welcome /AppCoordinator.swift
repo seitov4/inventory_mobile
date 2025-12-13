@@ -8,7 +8,7 @@
 import UIKit
 
 final class AppCoordinator: Coordinator {
-    
+
     private let window: UIWindow
     let navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
@@ -17,30 +17,28 @@ final class AppCoordinator: Coordinator {
         self.window = window
         self.navigationController = UINavigationController()
     }
-    
+
     func start() {
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
-        
-        // Стартуем Welcome
+
+        startWelcome()
+    }
+
+    private func startWelcome() {
         let welcome = WelcomeCoordinator(navigationController: navigationController)
-        childCoordinators.append(welcome)
+        childCoordinators = [welcome]
+
         welcome.onFinish = { [weak self] in
-            print ("AppCoordinator: onFinish fired")
             self?.startLogin()
         }
+
         welcome.start()
     }
-    
-    private func startMainFlow() {
-        let main = MainCoordinator(window: window)
-        childCoordinators.append(main)
-        main.start()
-    }
-    
+
     private func startLogin() {
         let login = LoginCoordinator(navigationController: navigationController)
-        childCoordinators.append(login)
+        childCoordinators = [login]
 
         login.onFinish = { [weak self] in
             self?.startMainFlow()
@@ -49,4 +47,9 @@ final class AppCoordinator: Coordinator {
         login.start()
     }
 
+    private func startMainFlow() {
+        let main = MainCoordinator(window: window)
+        childCoordinators = [main]
+        main.start()
+    }
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D95940142EBAA36E0026E3F9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D95940132EBAA36E0026E3F9 /* SnapKit */; };
+		D9A4CD502EE86E7000233FA3 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = D9A4CD4F2EE86E7000233FA3 /* KeychainAccess */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9A4CD502EE86E7000233FA3 /* KeychainAccess in Frameworks */,
 				D95940142EBAA36E0026E3F9 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +86,7 @@
 			name = UIKitPractice;
 			packageProductDependencies = (
 				D95940132EBAA36E0026E3F9 /* SnapKit */,
+				D9A4CD4F2EE86E7000233FA3 /* KeychainAccess */,
 			);
 			productName = UIKitPractice;
 			productReference = D9593FF72EBA9FF80026E3F9 /* UIKitPractice.app */;
@@ -97,7 +100,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					D9593FF62EBA9FF80026E3F9 = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D95940122EBAA36E0026E3F9 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				D9A4CD4E2EE86E7000233FA3 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D9593FF82EBA9FF80026E3F9 /* Products */;
@@ -268,6 +272,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -325,6 +330,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -362,6 +368,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		D9A4CD4E2EE86E7000233FA3 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -369,6 +383,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D95940122EBAA36E0026E3F9 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		D9A4CD4F2EE86E7000233FA3 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D9A4CD4E2EE86E7000233FA3 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

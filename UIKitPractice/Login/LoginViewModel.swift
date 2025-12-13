@@ -10,54 +10,39 @@ import Foundation
 final class LoginViewModel {
 
     var onLoginSuccess: (() -> Void)?
-    var onValidationChanged: ((_ isEmailValid: Bool, _ isPasswordValid: Bool) -> Void)?
-    
-    private(set) var isEmailValid: Bool = false
-    private(set) var isPasswordValid: Bool = false
-    
-    func validateEmail (_ email: String?){
-        let text = email ?? ""
-        isEmailValid = Self.isValidEmail(text)
-        onValidationChanged? (isEmailValid, isPasswordValid)
-    }
-    
-    func validatePassword (_ password: String?){
-        let text = password ?? ""
-        isPasswordValid = Self.isValidPassword(text)
-        onValidationChanged? (isEmailValid, isPasswordValid)
-    }
-    
+    var onLoginFailure: ((_ error: String) -> Void)?
+
+    private let authService = AuthService()
 
     func login(email: String?, password: String?) {
-        validateEmail(email)
-        validatePassword(password)
-        
-        guard isEmailValid && isPasswordValid else {
+
+        guard let email = email, !email.isEmpty else {
+            onLoginFailure?("Введите email")
             return
         }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
-            self.onLoginSuccess?()
+
+        guard let password = password, !password.isEmpty else {
+            onLoginFailure?("Введите пароль")
+            return
+        }
+
+        authService.login(email: email, password: password) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.onLoginSuccess?()
+
+                case .failure(let error):
+                    // Показываем сообщение, которое вернёт backend
+                    let backendMessage = error.localizedDescription
+
+                    if backendMessage.contains("401") {
+                        self?.onLoginFailure?("Неверный email или пароль")
+                    } else {
+                        self?.onLoginFailure?(backendMessage)
+                    }
+                }
+            }
         }
     }
-    
-    static func isValidEmail(_ email: String) -> Bool {
-        guard !email.isEmpty else { return false }
-        
-        let pattern = #"^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
-        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: email)
-    }
-    
-    static func isValidPassword(_ password: String) -> Bool {
-        guard password.count >= 8 else { return false }
-        
-        let letterSet = CharacterSet.letters
-        let digitSet = CharacterSet.decimalDigits
-        
-        if password.rangeOfCharacter(from: letterSet) == nil { return false }
-        if password.rangeOfCharacter(from: digitSet) == nil { return false }
-        
-        return true
-    }
 }
-

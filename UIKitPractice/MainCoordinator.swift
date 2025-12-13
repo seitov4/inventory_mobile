@@ -7,68 +7,104 @@
 
 import UIKit
 
-final class MainCoordinator: Coordinator {
-    let navigationController: UINavigationController
-    // для соответствия протоколу
+final class MainCoordinator: NSObject, Coordinator {
+
     private let window: UIWindow
     var childCoordinators: [Coordinator] = []
 
+    private var profileCoordinator: ProfileCoordinator?
+
     init(window: UIWindow) {
         self.window = window
-        // этот navigationController не будет видим; у нас будет TabBar как root
-        self.navigationController = UINavigationController()
-
+        super.init()
     }
 
     func start() {
-        let tabBar = UITabBarController()
-        tabBar.view.backgroundColor = .systemBackground
 
-        // 1) Dashboard
-        let dashboardNav = UINavigationController()
-        let dashboardCoord = DashboardCoordinator(navigationController: dashboardNav)
-        childCoordinators.append(dashboardCoord)
-        dashboardCoord.start()
-        if let dashboardRoot = dashboardNav.viewControllers.first {
-            dashboardRoot.tabBarItem = UITabBarItem(title: "Главная", image: UIImage(systemName: "chart.bar"), tag: 0)
-        }
+        // MARK: - NavigationControllers
+        let analyticsNav = UINavigationController()
+        let analytics = AnalyticsCoordinator(navigationController: analyticsNav)
+        analytics.start()
+        childCoordinators.append(analytics)
 
-        // 2) Reports (заглушка)
-        let reportsNav = UINavigationController()
-        let reportsVC = UIViewController()
-        reportsVC.view.backgroundColor = .systemBackground
-        reportsVC.title = "Отчёты"
-        reportsVC.tabBarItem = UITabBarItem(title: "Отчёты", image: UIImage(systemName: "doc.text"), tag: 1)
-        reportsNav.setViewControllers([reportsVC], animated: false)
+        let productsNav = UINavigationController()
+        let products = ProductsCoordinator(navigationController: productsNav)
+        products.start()
+        childCoordinators.append(products)
 
-        // 3) Profile
+        let quickNav = UINavigationController()
+        let quick = QuickSaleCoordinator(navigationController: quickNav)
+        quick.start()
+        childCoordinators.append(quick)
+
+        let notificationsNav = UINavigationController()
+        let notifications = NotificationsCoordinator(navigationController: notificationsNav)
+        notifications.start()
+        childCoordinators.append(notifications)
+
         let profileNav = UINavigationController()
-        let profileCoord = ProfileCoordinator(navigationController: profileNav)
-        
-        profileCoord.onLogout = {[weak self] in
-            self?.logout()
+        let profile = ProfileCoordinator(window: window, navigationController: profileNav)
+        profile.start()
+        childCoordinators.append(profile)
+        profileCoordinator = profile
+
+        // MARK: - TabBarController
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [
+            createTab(nav: analyticsNav, image: "chart.bar.fill", tag: 0),
+            createTab(nav: productsNav, image: "cube.fill", tag: 1),
+            createTab(nav: quickNav, image: "qrcode.viewfinder", tag: 2),
+            createTab(nav: notificationsNav, image: "bell.fill", tag: 3),
+            createTab(nav: profileNav, image: "person.fill", tag: 4)
+        ]
+
+        // MARK: - TabBar Appearance
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+
+        let clearTitle: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.clear
+        ]
+
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = clearTitle
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = clearTitle
+        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 100)
+        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 100)
+
+        appearance.stackedLayoutAppearance.normal.iconColor = .systemGray
+        appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
+
+        appearance.shadowColor = .clear
+        appearance.backgroundEffect = nil
+
+        tabBarController.tabBar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBarController.tabBar.scrollEdgeAppearance = appearance
         }
-        childCoordinators.append(profileCoord)
-        profileCoord.start()
 
-        
-        if let profileRoot = profileNav.viewControllers.first {
-            profileRoot.tabBarItem = UITabBarItem(title: "Профиль", image: UIImage(systemName: "person"), tag: 2)
-        }
+        tabBarController.tabBar.isSpringLoaded = false
+        tabBarController.tabBar.selectionIndicatorImage = UIImage()
+        tabBarController.tabBar.itemPositioning = .fill
 
-        tabBar.setViewControllers([dashboardNav, reportsNav, profileNav], animated: false)
-
-        // Устанавливаем TabBar как root окна
-        window.rootViewController = tabBar
+        window.rootViewController = tabBarController
         window.makeKeyAndVisible()
     }
-    private func logout() {
-        childCoordinators.removeAll()
 
-        let appCoordinator = AppCoordinator(window: window)
-        childCoordinators.append(appCoordinator)
-        appCoordinator.start()
+    private func createTab(nav: UINavigationController, image: String, tag: Int) -> UINavigationController {
+        let config = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+        let image = UIImage(systemName: image)?.withConfiguration(config)
+
+        let item = UITabBarItem(
+            title: "",
+            image: image,
+            selectedImage: image
+        )
+
+        item.imageInsets = .zero
+        item.tag = tag
+
+        nav.tabBarItem = item
+        return nav
     }
 }
-
-

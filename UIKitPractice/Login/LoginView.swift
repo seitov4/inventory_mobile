@@ -49,7 +49,6 @@ final class LoginView: UIView {
         emailField.keyboardType = .emailAddress
         emailField.autocapitalizationType = .none
         emailField.autocorrectionType = .no
-        emailField.returnKeyType = .next
         
         emailErrorLabel.font = .systemFont(ofSize: 12)
         emailErrorLabel.textColor = .systemRed
@@ -68,17 +67,19 @@ final class LoginView: UIView {
         passwordErrorLabel.numberOfLines = 1
         passwordErrorLabel.isHidden = true
         
-        //MARK: Buttons
+        //MARK: Button — ВСЕГДА активна
         var config = UIButton.Configuration.filled()
         config.title = "Войти"
         config.baseBackgroundColor = .systemBlue
         config.baseForegroundColor = .white
         config.cornerStyle = .medium
         config.contentInsets = NSDirectionalEdgeInsets(top:12, leading: 20, bottom: 12, trailing: 20)
-        loginButton.configuration = config
-        loginButton.isEnabled = false
         
-        forgorPasswordButton.setTitle("Заыли пароль?", for: .normal)
+        loginButton.configuration = config
+        loginButton.isEnabled = true
+        loginButton.alpha = 1.0
+        
+        forgorPasswordButton.setTitle("Забыли пароль?", for: .normal)
         forgorPasswordButton.setTitleColor(.systemBlue, for: .normal)
         forgorPasswordButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
         
@@ -89,8 +90,6 @@ final class LoginView: UIView {
         let eyeButton = UIButton(type: .system)
         eyeButton.setImage(UIImage(systemName: "eye.fill"), for: .normal)
         eyeButton.tintColor = .secondaryLabel
-        eyeButton.frame = CGRect(x:0, y:0, width: 20, height: 20)
-        eyeButton.imageView?.contentMode = .scaleAspectFit
         eyeButton.addTarget(self, action: #selector(togglePasswordVisibility), for: .touchUpInside)
         
         passwordField.rightView = eyeButton
@@ -102,12 +101,18 @@ final class LoginView: UIView {
         let imageName = passwordField.isSecureTextEntry ? "eye.fill" : "eye.slash.fill"
         sender.setImage(UIImage(systemName: imageName), for: .normal)
         
-        if let text = passwordField.text, passwordField.isSecureTextEntry {
-            passwordField.text?.removeAll()
+        // Фикс мигания текста
+        if let text = passwordField.text {
+            passwordField.text = ""
             passwordField.insertText(text)
         }
     }
     
+    // MARK: Ошибка (из backend)
+    func showGeneralError(_ text: String?) {
+        emailErrorLabel.text = text
+        emailErrorLabel.isHidden = (text == nil)
+    }
     
     private func setupLayout() {
         let headerStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
@@ -115,20 +120,13 @@ final class LoginView: UIView {
         headerStack.spacing = 6
         headerStack.alignment = .center
         
-        let emailStack = UIStackView(arrangedSubviews: [emailField, emailErrorLabel])
-        emailStack.axis = .vertical
-        emailStack.spacing = 6
-        
-        let passwordStack = UIStackView(arrangedSubviews: [passwordField, passwordErrorLabel])
-        passwordStack.axis = .vertical
-        passwordStack.spacing = 6
-        
         let fieldStack = UIStackView(arrangedSubviews: [emailField, passwordField])
         fieldStack.axis = .vertical
         fieldStack.spacing = 12
         
         cardView.addSubview(fieldStack)
         fieldStack.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             fieldStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             fieldStack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
@@ -149,28 +147,11 @@ final class LoginView: UIView {
         
         addSubview(mainStack)
         mainStack.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             mainStack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 60),
             mainStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
             mainStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24)
         ])
-        
-        emailStack.heightAnchor.constraint(equalToConstant: 44).isActive = true
-        passwordStack.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
-    
-    func showEmailError(_ text: String?) {
-        emailErrorLabel.text = text
-        emailErrorLabel.isHidden = (text == nil)
-    }
-    func showPasswordError(_ text: String?){
-        passwordErrorLabel.text = text
-        passwordErrorLabel.isHidden = (text == nil)
-    }
-    func setLoginEnabled(_ enabled: Bool){
-        loginButton.isEnabled = enabled
-        loginButton.alpha = enabled ? 1.0 : 0.6
-    }
-    
 }
-

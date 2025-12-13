@@ -10,17 +10,25 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    var coordinator: AppCoordinator?
+    var mainCoordinator: MainCoordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
+        ThemeManager.shared.applySavedTheme()
 
+        guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        let appCoordinator = AppCoordinator(window: window)
-        self.coordinator = appCoordinator
-        appCoordinator.start()
         self.window = window
+
+        // Запуск MainCoordinator
+        mainCoordinator = MainCoordinator(window: window)
+        mainCoordinator?.start()
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        print("App opened with URL:", url.absoluteString)
     }
 }
+
 
 

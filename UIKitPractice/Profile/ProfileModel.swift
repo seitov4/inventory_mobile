@@ -2,20 +2,15 @@
 //  ProfileModel.swift
 //  UIKitPractice
 //
-//  Created by Nurseit Seitov on 18.11.2025.
+//  Created by Nurseit Seitov on 06.12.2025.
 //
 
 import Foundation
 
-
-struct Profile: Codable {
+struct ProfileModel {
     var name: String
-    var age: Int
-    var gender: Gender
+    var email: String
     var notificationsEnabled: Bool
-    
-    enum Gender: String, Codable {
-        case male = "Мужчина"
-        case female = "Женщина"
-    }
+    var appearanceIndex: Int // 0 = Light, 1 = Dark, 2 = System
 }
+

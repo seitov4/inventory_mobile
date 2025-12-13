@@ -2,56 +2,57 @@
 //  ProfileViewModel.swift
 //  UIKitPractice
 //
-//  Created by Nurseit Seitov on 18.11.2025.
+//  Created by Nurseit Seitov on 06.12.2025.
 //
 
-import UIKit
+import Foundation
 
-class ProfileViewModel {
-    
-    private var profile: Profile
-    
-    init(profile: Profile = Profile(name: "", age: 0, gender: .male, notificationsEnabled: false)) {
-        self.profile = profile
+final class ProfileViewModel {
+
+    // MARK: - Properties
+    private(set) var profile: ProfileModel
+
+    // Callbacks to View
+    var onProfileUpdated: ((ProfileModel) -> Void)?
+
+    // MARK: - Init
+    init() {
+        // Load from UserDefaults or default
+        let name = UserDefaults.standard.string(forKey: "profile_name") ?? "User Name"
+        let email = UserDefaults.standard.string(forKey: "profile_email") ?? "user@example.com"
+        let notifications = UserDefaults.standard.bool(forKey: "profile_notifications")
+        let appearance = UserDefaults.standard.integer(forKey: "profile_appearance") // default 0
+
+        profile = ProfileModel(name: name, email: email, notificationsEnabled: notifications, appearanceIndex: appearance)
     }
-    
-    var currentProfile: Profile {
-        return profile
-    }
-    
-    var onLogout: (() -> Void)?
-    
-    func logoutTapped() {
-        onLogout?()
-    }
-    
-    func segmentChanged(index: Int) {
-        profile.gender = index == 0 ? .male : .female
-    }
-    
-    func switchChanged(isOn: Bool) {
+
+    // MARK: - Actions
+    func updateNotifications(_ isOn: Bool) {
         profile.notificationsEnabled = isOn
+        UserDefaults.standard.set(isOn, forKey: "profile_notifications")
+        onProfileUpdated?(profile)
     }
-    
-    func sliderChanged(value: Float) {
-        profile.age = Int(value)
+
+    func updateAppearance(_ index: Int) {
+        profile.appearanceIndex = index
+        UserDefaults.standard.set(index, forKey: "profile_appearance")
+        onProfileUpdated?(profile)
     }
-    
-    
-    
-    func buttonTapped(name: String?, age: Int) -> (success: Bool, message: String) {
-        // используем validator (который уже тримит)
-        guard ProfileValidator.isValidName(name) else {
-            return (false, "Введите имя")
-        }
-        guard ProfileValidator.isValidAge(age) else {
-            return (false, "Пользователю должно быть не менее 18 лет")
-        }
-        // now safe: name exists and is not empty after trimming
-        let finalName = name!.trimmingCharacters(in: .whitespacesAndNewlines)
-        profile.name = finalName
-        profile.age = age
-        ProfileService.shared.saveProfile(profile)
-        return (true, "Данные профиля обновлены")
+
+    func logout() {
+        // Clear user session / token
+        print("Logout tapped")
+    }
+
+    func editProfile() {
+        print("Edit profile tapped")
+    }
+
+    func changePassword() {
+        print("Change password tapped")
+    }
+
+    func openSupport() {
+        print("Open support tapped")
     }
 }
