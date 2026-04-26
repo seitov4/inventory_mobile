@@ -18,7 +18,9 @@ final class AnalyticsCoordinator: Coordinator {
     }
 
     func start() {
-        let vc = AnalyticsViewController()
+        nav.navigationBar.prefersLargeTitles = true
+        let viewModel = AnalyticsViewModel()
+        let vc = AnalyticsViewController(viewModel: viewModel)
         nav.setViewControllers([vc], animated: false)
     }
 }

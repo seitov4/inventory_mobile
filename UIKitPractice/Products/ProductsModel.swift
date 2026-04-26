@@ -22,7 +22,7 @@ struct Product: Decodable, Identifiable {
     }
     
     var formattedPrice: String {
-        return String(format: "$%.0f", price)
+        AppCurrency.string(from: price)
     }
     
     var displaySubtitle: String {
@@ -43,7 +43,7 @@ struct ProductStats: Decodable {
     let totalValue: Double
     
     var formattedValue: String {
-        return String(format: "$%.0f", totalValue)
+        AppCurrency.string(from: totalValue)
     }
 }
 
@@ -61,7 +61,7 @@ struct Category {
     let name: String
     let displayName: String
     
-    static let all = Category(name: "all", displayName: "All")
+    static let all = Category(name: "all", displayName: "Все")
     
     var isAll: Bool {
         return name == "all"

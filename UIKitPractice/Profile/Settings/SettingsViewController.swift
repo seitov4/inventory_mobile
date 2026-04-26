@@ -35,7 +35,6 @@ final class SettingsViewController: UIViewController {
         settingsView.onChangeAppearance = { [weak self] raw in
             guard let self = self else { return }
             self.viewModel.updateAppearance(raw)
-            ThemeManager.shared.applyTheme(AppTheme(rawValue: raw) ?? .system)
         }
 
         settingsView.onToggleNotifications = { [weak self] isOn in

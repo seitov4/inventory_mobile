@@ -51,11 +51,11 @@ final class MainCoordinator: NSObject, Coordinator {
         // MARK: - TabBarController
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            createTab(nav: analyticsNav, image: "chart.bar.fill", tag: 0),
-            createTab(nav: productsNav, image: "cube.fill", tag: 1),
-            createTab(nav: quickNav, image: "qrcode.viewfinder", tag: 2),
-            createTab(nav: notificationsNav, image: "bell.fill", tag: 3),
-            createTab(nav: profileNav, image: "person.fill", tag: 4)
+            createTab(nav: analyticsNav, title: "Аналитика", image: "chart.bar.fill", tag: 0),
+            createTab(nav: productsNav, title: "Товары", image: "cube.fill", tag: 1),
+            createTab(nav: quickNav, title: "Продажа", image: "qrcode.viewfinder", tag: 2),
+            createTab(nav: notificationsNav, title: "Уведомления", image: "bell.fill", tag: 3),
+            createTab(nav: profileNav, title: "Профиль", image: "person.fill", tag: 4)
         ]
 
         // MARK: - TabBar Appearance
@@ -63,14 +63,20 @@ final class MainCoordinator: NSObject, Coordinator {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .systemBackground
 
-        let clearTitle: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.clear
+        let titleFont = UIFont.systemFont(ofSize: 10, weight: .medium)
+        let normalTitle: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.secondaryLabel,
+            .font: titleFont
+        ]
+        let selectedTitle: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.systemBlue,
+            .font: titleFont
         ]
 
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = clearTitle
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = clearTitle
-        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 100)
-        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 100)
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalTitle
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedTitle
+        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = .zero
+        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = .zero
 
         appearance.stackedLayoutAppearance.normal.iconColor = .systemGray
         appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
@@ -89,19 +95,19 @@ final class MainCoordinator: NSObject, Coordinator {
 
         window.rootViewController = tabBarController
         window.makeKeyAndVisible()
+        ThemeManager.shared.applySavedTheme()
     }
 
-    private func createTab(nav: UINavigationController, image: String, tag: Int) -> UINavigationController {
-        let config = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+    private func createTab(nav: UINavigationController, title: String, image: String, tag: Int) -> UINavigationController {
+        let config = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
         let image = UIImage(systemName: image)?.withConfiguration(config)
 
         let item = UITabBarItem(
-            title: "",
+            title: title,
             image: image,
             selectedImage: image
         )
 
-        item.imageInsets = .zero
         item.tag = tag
 
         nav.tabBarItem = item

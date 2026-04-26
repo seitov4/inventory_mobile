@@ -15,9 +15,22 @@
 		D9593FF72EBA9FF80026E3F9 /* UIKitPractice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitPractice.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D9F0A1122F0000020026E3F9 /* Exceptions for "UIKitPractice" folder in "UIKitPractice" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D9593FF62EBA9FF80026E3F9 /* UIKitPractice */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D9593FF92EBA9FF80026E3F9 /* UIKitPractice */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D9F0A1122F0000020026E3F9 /* Exceptions for "UIKitPractice" folder in "UIKitPractice" target */,
+			);
 			path = UIKitPractice;
 			sourceTree = "<group>";
 		};

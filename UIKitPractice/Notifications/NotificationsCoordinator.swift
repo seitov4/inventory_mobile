@@ -18,7 +18,9 @@ final class NotificationsCoordinator: Coordinator {
     }
 
     func start() {
-        let vc = NotificationsViewController()
+        nav.navigationBar.prefersLargeTitles = true
+        let viewModel = NotificationsViewModel()
+        let vc = NotificationsViewController(viewModel: viewModel)
         nav.setViewControllers([vc], animated: false)
     }
     

@@ -200,14 +200,13 @@ final class ProductCell: UITableViewCell {
         backgroundColor = .clear
         selectionStyle = .none
         
-        containerView.backgroundColor = .white
+        containerView.backgroundColor = .secondarySystemGroupedBackground
         containerView.layer.cornerRadius = 12
-        containerView.layer.shadowColor = UIColor.black.cgColor
-        containerView.layer.shadowOffset = CGSize(width: 0, height: 1)
-        containerView.layer.shadowRadius = 2
-        containerView.layer.shadowOpacity = 0.1
-        
-        iconView.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0) // Светло-серый фон для иконки
+        containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        containerView.layer.shadowRadius = 4
+        applyContainerShadow()
+
+        iconView.backgroundColor = .adaptiveIconTileBackground()
         iconView.layer.cornerRadius = 24
         iconImageView.image = UIImage(systemName: "cube.fill")
         iconImageView.tintColor = .label
@@ -275,17 +274,31 @@ final class ProductCell: UITableViewCell {
         
         accessoryType = .disclosureIndicator
     }
-    
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            applyContainerShadow()
+        }
+    }
+
+    private func applyContainerShadow() {
+        containerView.layer.shadowColor = UIColor.adaptiveCardShadowBase()
+            .resolvedColor(with: traitCollection)
+            .cgColor
+        containerView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.14
+    }
+
     func configure(with product: Product) {
         nameLabel.text = product.name
         subtitleLabel.text = product.displaySubtitle
         
         if product.isLowStock {
-            quantityView.backgroundColor = UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0) // #FFA500
+            quantityView.backgroundColor = UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0)
             quantityLabel.text = "\(product.quantity)"
-            quantityLabel.textColor = .label
+            quantityLabel.textColor = .black
         } else {
-            quantityView.backgroundColor = UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0) // #6FCF97
+            quantityView.backgroundColor = UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0)
             quantityLabel.text = "\(product.quantity)"
             quantityLabel.textColor = .white
         }

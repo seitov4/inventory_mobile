@@ -49,35 +49,48 @@ final class ProductsView: UIView {
     }
     
     private func setupStatsCards() {
-        // Цвета из скриншота
         totalProductsCard.configure(
             icon: "cube.fill",
             value: "0",
-            label: "Total",
-            backgroundColor: UIColor(red: 0.11, green: 0.48, blue: 0.96, alpha: 0.15), // #1C7AF5 с alpha
-            iconColor: UIColor(red: 0.11, green: 0.48, blue: 0.96, alpha: 1.0), // #1C7AF5
+            label: "Всего",
+            backgroundColor: .adaptiveTintBlueBackground(),
+            iconColor: UIColor(red: 0.11, green: 0.48, blue: 0.96, alpha: 1.0),
             valueColor: .label,
-            labelColor: .label
+            labelColor: .secondaryLabel
         )
-        
+
         lowStockCard.configure(
             icon: "exclamationmark.triangle.fill",
             value: "0",
-            label: "Low Stock",
-            backgroundColor: UIColor(red: 0.91, green: 0.98, blue: 0.89, alpha: 1.0), // #E8FAE4
-            iconColor: UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0), // #FFA500
+            label: "Мало на складе",
+            backgroundColor: .adaptiveLowStockCardBackground(),
+            iconColor: UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0),
             valueColor: .label,
-            labelColor: .label
+            labelColor: .secondaryLabel
         )
-        
+
         valueCard.configure(
             icon: "chart.line.uptrend.xyaxis",
-            value: "$0",
-            label: "Value",
+            value: AppCurrency.string(from: 0),
+            label: "Сумма",
             backgroundColor: .secondarySystemBackground,
-            iconColor: UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0), // #6FCF97
+            iconColor: UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0),
             valueColor: .label,
-            labelColor: .label
+            labelColor: .secondaryLabel
+        )
+
+        lossesCard.configure(
+            icon: "arrow.uturn.down.circle.fill",
+            value: "0",
+            label: "Списания",
+            backgroundColor: UIColor { traits in
+                traits.userInterfaceStyle == .dark
+                    ? UIColor.systemRed.withAlphaComponent(0.22)
+                    : UIColor.systemRed.withAlphaComponent(0.1)
+            },
+            iconColor: .systemRed,
+            valueColor: .label,
+            labelColor: .secondaryLabel
         )
         statsScrollView.backgroundColor = .clear
         
@@ -102,16 +115,17 @@ final class ProductsView: UIView {
     }
     
     private func setupSearchBar() {
-        searchBar.placeholder = "Search products, categories, or barcode..."
+        searchBar.placeholder = "Поиск по названию, категории или штрихкоду…"
         searchBar.searchBarStyle = .minimal
         
         // Исправление фона SearchBar согласно скриншоту
         searchBar.backgroundImage = UIImage()
-        searchBar.backgroundColor = UIColor(red: 0.93, green: 0.93, blue: 0.93, alpha: 1.0) // #EDEDED
-        searchBar.searchTextField.backgroundColor = UIColor(red: 0.93, green: 0.93, blue: 0.93, alpha: 1.0)
+        let searchFill = UIColor.adaptiveSearchBarFill()
+        searchBar.backgroundColor = searchFill
+        searchBar.searchTextField.backgroundColor = searchFill
         searchBar.searchTextField.textColor = .label
         searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
-            string: "Search products, categories, or barcode...",
+            string: "Поиск по названию, категории или штрихкоду…",
             attributes: [.foregroundColor: UIColor.secondaryLabel]
         )
         searchBar.layer.cornerRadius = 12

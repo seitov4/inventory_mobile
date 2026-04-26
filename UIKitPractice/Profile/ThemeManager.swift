@@ -35,15 +35,18 @@ final class ThemeManager {
     }
 
     func applyTheme(_ theme: AppTheme) {
-        guard let window = UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene })
-                .flatMap({ $0.windows })
-                .first(where: { $0.isKeyWindow }) else { return }
+        let windows = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
 
-        switch theme {
-        case .system: window.overrideUserInterfaceStyle = .unspecified
-        case .light:  window.overrideUserInterfaceStyle = .light
-        case .dark:   window.overrideUserInterfaceStyle = .dark
+        guard !windows.isEmpty else { return }
+
+        for window in windows {
+            switch theme {
+            case .system: window.overrideUserInterfaceStyle = .unspecified
+            case .light: window.overrideUserInterfaceStyle = .light
+            case .dark: window.overrideUserInterfaceStyle = .dark
+            }
         }
     }
 }

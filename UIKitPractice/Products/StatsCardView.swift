@@ -23,11 +23,10 @@ import UIKit
     
     private func setupUI() {
         layer.cornerRadius = 16
-        layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowRadius = 4
-        layer.shadowOpacity = 0.1
-        
+        layer.shadowRadius = 6
+        applyShadow()
+
         iconImageView.contentMode = .scaleAspectFit
         
         valueLabel.font = .systemFont(ofSize: 24, weight: .bold)
@@ -48,7 +47,21 @@ import UIKit
             iconImageView.heightAnchor.constraint(equalToConstant: 32)
         ])
     }
-    
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            applyShadow()
+        }
+    }
+
+    private func applyShadow() {
+        layer.shadowColor = UIColor.adaptiveCardShadowBase()
+            .resolvedColor(with: traitCollection)
+            .cgColor
+        layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0.45 : 0.18
+    }
+
     func configure(
         icon: String,
         value: String,
