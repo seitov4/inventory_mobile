@@ -162,6 +162,7 @@
 				DEVELOPMENT_TEAM = MV859P276L;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = UIKitPractice/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = InventiX;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
@@ -194,6 +195,7 @@
 				DEVELOPMENT_TEAM = MV859P276L;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = UIKitPractice/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = InventiX;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
