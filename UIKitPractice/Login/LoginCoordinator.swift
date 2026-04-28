@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class LoginCoordinator: Coordinator {
 
@@ -19,13 +20,11 @@ final class LoginCoordinator: Coordinator {
     }
 
     func start() {
-        let viewModel = LoginViewModel()
-        viewModel.onLoginSuccess = { [weak self] in
-            print("LoginCoordinator: login success")
+        let vm = LoginScreenViewModel()
+        let view = LoginScreen(viewModel: vm) { [weak self] in
             self?.onFinish?()
         }
-
-        let vc = LoginViewController(viewModel: viewModel)
+        let vc = UIHostingController(rootView: view)
         navigationController.setViewControllers([vc], animated: false)
     }
 }

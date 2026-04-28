@@ -25,4 +25,18 @@ final class KeychainManager {
     func deleteToken() {
         try? keychain.remove(tokenKey)
     }
+
+    // MARK: - Generic helpers
+
+    func saveString(_ value: String, key: String) {
+        keychain[key] = value
+    }
+
+    func getString(key: String) -> String? {
+        keychain[key]
+    }
+
+    func delete(key: String) {
+        try? keychain.remove(key)
+    }
 }

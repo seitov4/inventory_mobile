@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class ProfileCoordinator: Coordinator {
 
@@ -24,8 +25,7 @@ final class ProfileCoordinator: Coordinator {
         // ВАЖНО: подключаем ВСЕ переходы
         profileVC.onShowSettings = { [weak self] in
             guard let self else { return }
-            let vm = SettingsViewModel()
-            let vc = SettingsViewController(viewModel: vm)
+            let vc = UIHostingController(rootView: SettingsScreen(viewModel: SettingsScreenViewModel()))
             self.navigationController.pushViewController(vc, animated: true)
         }
 
@@ -59,7 +59,7 @@ final class ProfileCoordinator: Coordinator {
     }
 
     private func logout() {
-        print("Logout выполнен")
+        KeychainManager.shared.deleteToken()
         let appCoordinator = AppCoordinator(window: window)
         childCoordinators.removeAll()
         childCoordinators.append(appCoordinator)

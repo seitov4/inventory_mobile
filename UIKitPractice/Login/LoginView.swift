@@ -48,7 +48,7 @@ final class LoginView: UIView {
         logoImageView.tintColor = .systemBlue
         logoImageView.contentMode = .scaleAspectFit
 
-        titleLabel.text = "Companion"
+        titleLabel.text = "InventiX"
         titleLabel.font = .systemFont(ofSize: 36, weight: .bold)
         titleLabel.textAlignment = .center
 

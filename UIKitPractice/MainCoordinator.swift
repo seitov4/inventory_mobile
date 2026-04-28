@@ -93,8 +93,19 @@ final class MainCoordinator: NSObject, Coordinator {
         tabBarController.tabBar.selectionIndicatorImage = UIImage()
         tabBarController.tabBar.itemPositioning = .fill
 
-        window.rootViewController = tabBarController
-        window.makeKeyAndVisible()
+        if window.rootViewController == nil {
+            window.rootViewController = tabBarController
+            window.makeKeyAndVisible()
+        } else {
+            UIView.transition(
+                with: window,
+                duration: 0.35,
+                options: [.transitionCrossDissolve, .curveEaseInOut]
+            ) {
+                self.window.rootViewController = tabBarController
+                self.window.makeKeyAndVisible()
+            }
+        }
         ThemeManager.shared.applySavedTheme()
     }
 
