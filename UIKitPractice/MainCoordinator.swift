@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class MainCoordinator: NSObject, Coordinator {
 
@@ -13,6 +14,10 @@ final class MainCoordinator: NSObject, Coordinator {
     var childCoordinators: [Coordinator] = []
 
     private var profileCoordinator: ProfileCoordinator?
+    private var tabBarController: UITabBarController?
+    private var quickNavController: UINavigationController?
+    private var notificationsNavController: UINavigationController?
+    private var profileNavController: UINavigationController?
 
     init(window: UIWindow) {
         self.window = window
@@ -36,17 +41,20 @@ final class MainCoordinator: NSObject, Coordinator {
         let quick = QuickSaleCoordinator(navigationController: quickNav)
         quick.start()
         childCoordinators.append(quick)
+        quickNavController = quickNav
 
         let notificationsNav = UINavigationController()
         let notifications = NotificationsCoordinator(navigationController: notificationsNav)
         notifications.start()
         childCoordinators.append(notifications)
+        notificationsNavController = notificationsNav
 
         let profileNav = UINavigationController()
         let profile = ProfileCoordinator(window: window, navigationController: profileNav)
         profile.start()
         childCoordinators.append(profile)
         profileCoordinator = profile
+        profileNavController = profileNav
 
         // MARK: - TabBarController
         let tabBarController = UITabBarController()
@@ -92,6 +100,7 @@ final class MainCoordinator: NSObject, Coordinator {
         tabBarController.tabBar.isSpringLoaded = false
         tabBarController.tabBar.selectionIndicatorImage = UIImage()
         tabBarController.tabBar.itemPositioning = .fill
+        self.tabBarController = tabBarController
 
         if window.rootViewController == nil {
             window.rootViewController = tabBarController
@@ -107,6 +116,26 @@ final class MainCoordinator: NSObject, Coordinator {
             }
         }
         ThemeManager.shared.applySavedTheme()
+    }
+
+    func openShortcut(_ route: AppShortcutRoute) {
+        guard let tabBarController else { return }
+        switch route {
+        case .quickSale:
+            tabBarController.selectedIndex = 2
+            quickNavController?.popToRootViewController(animated: false)
+        case .notifications:
+            tabBarController.selectedIndex = 3
+            notificationsNavController?.popToRootViewController(animated: false)
+        case .myEnterprise:
+            tabBarController.selectedIndex = 4
+            guard let profileNavController else { return }
+            profileNavController.popToRootViewController(animated: false)
+            let settingsVC = UIHostingController(rootView: SettingsScreen(viewModel: SettingsScreenViewModel()))
+            let enterpriseVC = UIHostingController(rootView: MyEnterpriseScreen(viewModel: .mock()))
+            profileNavController.pushViewController(settingsVC, animated: false)
+            profileNavController.pushViewController(enterpriseVC, animated: false)
+        }
     }
 
     private func createTab(nav: UINavigationController, title: String, image: String, tag: Int) -> UINavigationController {

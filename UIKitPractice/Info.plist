@@ -30,6 +30,39 @@
 	<string>InventiX использует Face ID / Touch ID для быстрого и безопасного входа в приложение.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.inventix.shortcut.quickSale</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Продажа</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>Открыть экран продажи</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>qrcode.viewfinder</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.inventix.shortcut.myEnterprise</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Мое предприятие</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>Открыть настройки предприятия</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>building.2.fill</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.inventix.shortcut.notifications</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Уведомления</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>Открыть уведомления</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>bell.fill</string>
+		</dict>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>

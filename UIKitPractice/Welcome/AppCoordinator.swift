@@ -14,10 +14,21 @@ final class AppCoordinator: Coordinator {
     let navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
     private let authManager = AuthManager.shared
+    private var mainCoordinator: MainCoordinator?
 
     init(window: UIWindow) {
         self.window = window
         self.navigationController = UINavigationController()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleShortcutNotification(_:)),
+            name: .appShortcutTriggered,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func start() {
@@ -89,8 +100,13 @@ final class AppCoordinator: Coordinator {
 
     private func startMainFlow() {
         let main = MainCoordinator(window: window)
+        mainCoordinator = main
         childCoordinators = [main]
         main.start()
+        if let route = AppShortcutRouter.shared.pendingRoute {
+            main.openShortcut(route)
+            AppShortcutRouter.shared.pendingRoute = nil
+        }
     }
 
     private func startBiometricsPromptThenMain() {
@@ -108,6 +124,15 @@ final class AppCoordinator: Coordinator {
             options: [.transitionCrossDissolve, .curveEaseInOut]
         ) {
             self.navigationController.setViewControllers(viewControllers, animated: false)
+        }
+    }
+
+    @objc
+    private func handleShortcutNotification(_ notification: Notification) {
+        guard let route = notification.object as? AppShortcutRoute else { return }
+        if let mainCoordinator {
+            mainCoordinator.openShortcut(route)
+            AppShortcutRouter.shared.pendingRoute = nil
         }
     }
 }

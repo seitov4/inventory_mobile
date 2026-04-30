@@ -19,6 +19,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
 
+        if let shortcutItem = connectionOptions.shortcutItem,
+           let route = AppShortcutRoute(shortcutType: shortcutItem.type) {
+            AppShortcutRouter.shared.pendingRoute = route
+        }
+
         // Запуск AppCoordinator (Auth flow -> Main)
         appCoordinator = AppCoordinator(window: window)
         appCoordinator?.start()
@@ -27,6 +32,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else { return }
         print("App opened with URL:", url.absoluteString)
+    }
+
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        guard let route = AppShortcutRoute(shortcutType: shortcutItem.type) else {
+            completionHandler(false)
+            return
+        }
+        AppShortcutRouter.shared.pendingRoute = route
+        NotificationCenter.default.post(name: .appShortcutTriggered, object: route)
+        completionHandler(true)
     }
 }
 
