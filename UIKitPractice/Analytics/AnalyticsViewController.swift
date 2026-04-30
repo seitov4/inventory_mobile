@@ -23,10 +23,12 @@ final class AnalyticsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-        navigationItem.title = "Аналитика"
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.title = ""
+        navigationItem.largeTitleDisplayMode = .never
 
-        let root = AnalyticsScreen(viewModel: viewModel)
+        let root = AnalyticsScreen(viewModel: viewModel) { [weak self] in
+            self?.openAIChat()
+        }
         let host = UIHostingController(rootView: root)
         host.view.backgroundColor = .clear
         hostingController = host
@@ -41,5 +43,12 @@ final class AnalyticsViewController: UIViewController {
             host.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         host.didMove(toParent: self)
+    }
+
+    private func openAIChat() {
+        let chat = AIChatScreen(viewModel: AIChatViewModel(service: MockAIChatService()))
+        let vc = UIHostingController(rootView: chat)
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

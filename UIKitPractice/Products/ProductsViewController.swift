@@ -15,6 +15,7 @@ final class ProductsViewController: UIViewController {
     private var groupedProducts: [(category: String, products: [Product])] = []
     private var categories: [Category] = []
     private var selectedCategory: Category = .all
+    private let refreshControl = UIRefreshControl()
     
     override func loadView() {
         view = rootView
@@ -35,12 +36,28 @@ final class ProductsViewController: UIViewController {
     private func setupNavigationBar() {
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.title = "Товары"
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(
+                image: UIImage(systemName: "qrcode.viewfinder"),
+                style: .plain,
+                target: self,
+                action: #selector(scanTapped)
+            ),
+            UIBarButtonItem(
+                image: UIImage(systemName: "plus"),
+                style: .plain,
+                target: self,
+                action: #selector(addTapped)
+            )
+        ]
     }
     
     private func setupTableView() {
         rootView.tableView.delegate = self
         rootView.tableView.dataSource = self
         rootView.tableView.register(ProductCell.self, forCellReuseIdentifier: "ProductCell")
+        refreshControl.addTarget(self, action: #selector(refreshPulled), for: .valueChanged)
+        rootView.tableView.refreshControl = refreshControl
     }
     
     private func setupSearchBar() {
@@ -56,6 +73,8 @@ final class ProductsViewController: UIViewController {
             guard let self = self else { return }
             self.groupedProducts = self.viewModel.getProductsGroupedByCategory()
             self.rootView.tableView.reloadData()
+            self.updateEmptyState()
+            self.refreshControl.endRefreshing()
             
             if let stats = stats {
                 self.rootView.updateStats(
@@ -76,6 +95,7 @@ final class ProductsViewController: UIViewController {
         viewModel.onError = { [weak self] message in
             guard let self = self else { return }
             self.showAlert(title: "Ошибка", message: message)
+            self.refreshControl.endRefreshing()
         }
         
         viewModel.onLoadingStateChanged = { [weak self] isLoading in
@@ -97,12 +117,76 @@ final class ProductsViewController: UIViewController {
         viewModel.selectCategory(category)
         rootView.updateCategories(categories, selectedCategory: selectedCategory)
         setupCategoryButtonActions()
+        updateEmptyState()
+    }
+
+    @objc private func refreshPulled() {
+        viewModel.loadProducts()
+    }
+
+    @objc private func scanTapped() {
+        showAlert(title: "Сканер", message: "Сканирование штрихкода будет подключено в следующем этапе.")
+    }
+
+    @objc private func addTapped() {
+        showAlert(title: "Добавление", message: "Создание нового товара скоро появится.")
     }
     
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+
+    private func updateEmptyState() {
+        guard groupedProducts.isEmpty else {
+            rootView.tableView.backgroundView = nil
+            return
+        }
+        rootView.tableView.backgroundView = makeEmptyStateView()
+    }
+
+    private func makeEmptyStateView() -> UIView {
+        let container = UIView()
+        let icon = UIImageView(image: UIImage(systemName: "shippingbox"))
+        icon.tintColor = .tertiaryLabel
+        icon.contentMode = .scaleAspectFit
+        icon.translatesAutoresizingMaskIntoConstraints = false
+
+        let title = UILabel()
+        title.text = "Товары не найдены"
+        title.font = .systemFont(ofSize: 17, weight: .semibold)
+        title.textColor = .label
+        title.translatesAutoresizingMaskIntoConstraints = false
+
+        let subtitle = UILabel()
+        subtitle.text = "Попробуйте изменить фильтр или строку поиска."
+        subtitle.font = .systemFont(ofSize: 14)
+        subtitle.textColor = .secondaryLabel
+        subtitle.numberOfLines = 0
+        subtitle.textAlignment = .center
+        subtitle.translatesAutoresizingMaskIntoConstraints = false
+
+        container.addSubview(icon)
+        container.addSubview(title)
+        container.addSubview(subtitle)
+
+        NSLayoutConstraint.activate([
+            icon.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            icon.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: -26),
+            icon.widthAnchor.constraint(equalToConstant: 44),
+            icon.heightAnchor.constraint(equalToConstant: 44),
+
+            title.topAnchor.constraint(equalTo: icon.bottomAnchor, constant: 10),
+            title.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+
+            subtitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 6),
+            subtitle.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            subtitle.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor, constant: 24),
+            subtitle.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: -24)
+        ])
+
+        return container
     }
 }
 
@@ -129,7 +213,7 @@ extension ProductsViewController: UITableViewDataSource {
 
 extension ProductsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 92
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -184,6 +268,8 @@ final class ProductCell: UITableViewCell {
     private let iconImageView = UIImageView()
     private let nameLabel = UILabel()
     private let subtitleLabel = UILabel()
+    private let priceLabel = UILabel()
+    private let statusLabel = UILabel()
     private let quantityView = UIView()
     private let quantityLabel = UILabel()
     
@@ -219,6 +305,15 @@ final class ProductCell: UITableViewCell {
         subtitleLabel.font = .systemFont(ofSize: 14)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 1
+
+        priceLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        priceLabel.textColor = .systemBlue
+        priceLabel.numberOfLines = 1
+
+        statusLabel.font = .systemFont(ofSize: 11, weight: .semibold)
+        statusLabel.textAlignment = .center
+        statusLabel.layer.cornerRadius = 10
+        statusLabel.clipsToBounds = true
         
         quantityView.layer.cornerRadius = 16
         
@@ -226,7 +321,7 @@ final class ProductCell: UITableViewCell {
         quantityLabel.textColor = .label
         quantityLabel.textAlignment = .center
         
-        [containerView, iconView, iconImageView, nameLabel, subtitleLabel, quantityView, quantityLabel].forEach {
+        [containerView, iconView, iconImageView, nameLabel, subtitleLabel, priceLabel, statusLabel, quantityView, quantityLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -235,6 +330,8 @@ final class ProductCell: UITableViewCell {
         containerView.addSubview(iconView)
         containerView.addSubview(nameLabel)
         containerView.addSubview(subtitleLabel)
+        containerView.addSubview(priceLabel)
+        containerView.addSubview(statusLabel)
         containerView.addSubview(quantityView)
         contentView.addSubview(containerView)
         
@@ -261,6 +358,15 @@ final class ProductCell: UITableViewCell {
             subtitleLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
             subtitleLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
             subtitleLabel.trailingAnchor.constraint(lessThanOrEqualTo: quantityView.leadingAnchor, constant: -12),
+
+            priceLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            priceLabel.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 4),
+            priceLabel.trailingAnchor.constraint(lessThanOrEqualTo: statusLabel.leadingAnchor, constant: -8),
+
+            statusLabel.centerYAnchor.constraint(equalTo: priceLabel.centerYAnchor),
+            statusLabel.trailingAnchor.constraint(equalTo: quantityView.leadingAnchor, constant: -8),
+            statusLabel.heightAnchor.constraint(equalToConstant: 20),
+            statusLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 66),
             
             quantityView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -32),
             quantityView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
@@ -291,16 +397,23 @@ final class ProductCell: UITableViewCell {
 
     func configure(with product: Product) {
         nameLabel.text = product.name
-        subtitleLabel.text = product.displaySubtitle
+        subtitleLabel.text = product.barcode?.isEmpty == false ? product.barcode : "Без штрихкода"
+        priceLabel.text = product.formattedPrice
         
         if product.isLowStock {
             quantityView.backgroundColor = UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0)
             quantityLabel.text = "\(product.quantity)"
             quantityLabel.textColor = .black
+            statusLabel.text = "LOW STOCK"
+            statusLabel.textColor = .systemOrange
+            statusLabel.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.14)
         } else {
             quantityView.backgroundColor = UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0)
             quantityLabel.text = "\(product.quantity)"
             quantityLabel.textColor = .white
+            statusLabel.text = "IN STOCK"
+            statusLabel.textColor = .systemGreen
+            statusLabel.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.14)
         }
     }
 }

@@ -9,11 +9,19 @@ import SwiftUI
 
 struct AnalyticsScreen: View {
     @Bindable var viewModel: AnalyticsViewModel
+    let onOpenAIChat: () -> Void
     @Environment(\.colorScheme) private var colorScheme
+    @State private var isBannerVisible = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                analyticsHeader
+
+                aiPromoBanner
+                    .opacity(isBannerVisible ? 1 : 0)
+                    .offset(y: isBannerVisible ? 0 : 8)
+
                 Picker("Период", selection: $viewModel.period) {
                     ForEach(AnalyticsPeriodKind.allCases) { p in
                         Text(p.rawValue).tag(p)
@@ -32,6 +40,115 @@ struct AnalyticsScreen: View {
             .padding(.bottom, 24)
         }
         .background(Color(.systemGroupedBackground))
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.35)) {
+                isBannerVisible = true
+            }
+        }
+    }
+
+    private var analyticsHeader: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Главная")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                Text("Аналитика")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(.primary)
+            }
+
+            Spacer()
+
+            Button(action: onOpenAIChat) {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("AI чат")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(AnalyticsAIPalette.primaryGradient)
+                )
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 6)
+        }
+    }
+
+    private var aiPromoBanner: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(AnalyticsAIPalette.primaryGradient)
+                .shadow(color: UIChrome.cardShadowColor(for: colorScheme), radius: 12, y: 6)
+
+            Image(systemName: "sparkles")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.4))
+                .offset(x: 150, y: -56)
+
+            Image(systemName: "sparkle")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.35))
+                .offset(x: 138, y: 52)
+
+            HStack(spacing: 14) {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(.white.opacity(0.14))
+                    .frame(width: 84, height: 84)
+                    .overlay(
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 36, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.9))
+                    )
+
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 7) {
+                        Circle()
+                            .fill(.white.opacity(0.9))
+                            .frame(width: 6, height: 6)
+                        Text("InventiX · AI")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.95))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(.white.opacity(0.14))
+                    )
+
+                    Text("Повысьте продажи с AI-\nпомощником")
+                        .font(.title3.bold())
+                        .foregroundStyle(.white)
+
+                    Text("Анализ конкурентов, прогноз спроса и идеи роста за секунды")
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 8)
+
+                Button(action: onOpenAIChat) {
+                    ZStack {
+                        Circle()
+                            .fill(.white)
+                            .frame(width: 56, height: 56)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundStyle(Color(uiColor: UIColor(hex: 0x6E47E8)))
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(18)
+        }
+        .frame(height: 155)
     }
 
     private var metricsRow: some View {
@@ -193,4 +310,15 @@ private extension UIColor {
             alpha: alpha
         )
     }
+}
+
+enum AnalyticsAIPalette {
+    static let primaryGradient = LinearGradient(
+        colors: [
+            Color(uiColor: UIColor(hex: 0x6E47E8)),
+            Color(uiColor: UIColor(hex: 0x5A6BFF))
+        ],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
 }

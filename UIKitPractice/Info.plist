@@ -26,6 +26,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Нужен доступ к фото для выбора аватара</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>InventiX может сохранять изображения, прикрепленные в AI чат.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>InventiX использует камеру для добавления фото в AI чат.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>InventiX использует Face ID / Touch ID для быстрого и безопасного входа в приложение.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
