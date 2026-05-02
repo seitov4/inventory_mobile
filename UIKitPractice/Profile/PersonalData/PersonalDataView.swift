@@ -107,8 +107,8 @@ final class PersonalDataView: UIView {
         config.imagePadding = 10
         
         config.baseBackgroundColor = UIColor { $0.userInterfaceStyle == .dark
-            ? UIColor(red: 1.0, green: 0.3, blue: 0.28, alpha: 1)
-            : UIColor(red: 0.96, green: 0.11, blue: 0.34, alpha: 1)
+            ? UIColor(red: 1.0, green: 0.3, blue: 0.28, alpha: 1.0)
+            : UIColor(red: 1.0, green: 0.23, blue: 0.25, alpha: 1.0)
         }
         config.baseForegroundColor = .white
         

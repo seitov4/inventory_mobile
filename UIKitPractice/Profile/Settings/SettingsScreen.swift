@@ -9,7 +9,6 @@ final class SettingsScreenViewModel: ObservableObject {
     @Published var biometricsOn: Bool
     @Published var biometricsUnavailableReason: String?
     @Published var showBiometricsConfirm: Bool = false
-    @Published var isOwner: Bool
 
     private let settings = SettingsViewModel()
     private let authManager: AuthManager
@@ -19,8 +18,6 @@ final class SettingsScreenViewModel: ObservableObject {
         self.notificationsOn = settings.currentNotifications
         self.appearance = AppTheme(rawValue: settings.currentAppearanceIndex) ?? .system
         self.biometricsOn = authManager.isBiometricsEnabled
-        // TODO: Replace with real role from backend profile/session.
-        self.isOwner = (UserDefaults.standard.string(forKey: "current_user_role") ?? "owner").lowercased() == "owner"
         self.refreshBiometricsAvailability()
     }
 
@@ -121,19 +118,8 @@ struct SettingsScreen: View {
                         .foregroundStyle(.secondary)
                 }
             }
-
-            if viewModel.isOwner {
-                Section("Предприятие") {
-                    NavigationLink {
-                        MyEnterpriseScreen(viewModel: .mock())
-                    } label: {
-                        Label("Мое предприятие", systemImage: "building.2.fill")
-                    }
-                }
-            }
         }
         .navigationTitle("Настройки")
         .onAppear { viewModel.refreshBiometricsAvailability() }
     }
 }
-

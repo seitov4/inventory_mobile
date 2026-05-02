@@ -131,9 +131,7 @@ final class MainCoordinator: NSObject, Coordinator {
             tabBarController.selectedIndex = 4
             guard let profileNavController else { return }
             profileNavController.popToRootViewController(animated: false)
-            let settingsVC = UIHostingController(rootView: SettingsScreen(viewModel: SettingsScreenViewModel()))
             let enterpriseVC = UIHostingController(rootView: MyEnterpriseScreen(viewModel: .mock()))
-            profileNavController.pushViewController(settingsVC, animated: false)
             profileNavController.pushViewController(enterpriseVC, animated: false)
         }
     }

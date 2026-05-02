@@ -29,6 +29,12 @@ final class ProfileCoordinator: Coordinator {
             self.navigationController.pushViewController(vc, animated: true)
         }
 
+        profileVC.onShowEnterprise = { [weak self, weak profileVC] in
+            guard let self, let profileVC else { return }
+            let vc = UIHostingController(rootView: MyEnterpriseScreen(viewModel: profileVC.profileScreenViewModel.enterpriseViewModel))
+            self.navigationController.pushViewController(vc, animated: true)
+        }
+
         profileVC.onShowSupport = { [weak self] in
             guard let self else { return }
             let vc = SupportViewController()

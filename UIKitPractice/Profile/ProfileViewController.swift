@@ -7,10 +7,12 @@
 
 import UIKit
 import PhotosUI
+import SwiftUI
 
 final class ProfileViewController: UIViewController {
 
-    let profileView = ProfileView()
+    let profileScreenViewModel = ProfileScreenViewModel()
+    private var hostingController: UIHostingController<ProfileScreen>?
     
     // MARK: - Колбэки для координатора
     var onLogout: (() -> Void)?
@@ -18,46 +20,38 @@ final class ProfileViewController: UIViewController {
     var onShowSupport: (() -> Void)?
     var onShowEditProfile: (() -> Void)?
     var onShowProfileDetails: (() -> Void)?
-
-    override func loadView() {
-        view = profileView
-    }
+    var onShowEnterprise: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Профиль"
-        setupCallbacks()
-        
-
-        // TODO: заменить, когда появятся реальные данные
-        profileView.configure(name: "Иван Иванов", email: "ivan@example.com")
+        view.backgroundColor = .systemGroupedBackground
+        embedProfileScreen()
     }
 
-    private func setupCallbacks() {
-        profileView.onEditProfile = { [weak self] in
-            self?.onShowEditProfile?()
-        }
+    private func embedProfileScreen() {
+        let rootView = ProfileScreen(
+            viewModel: self.profileScreenViewModel,
+            onAvatarTap: { [weak self] in self?.openPhotoLibrary() },
+            onEnterpriseTap: { [weak self] in self?.onShowEnterprise?() },
+            onPersonalDataTap: { [weak self] in self?.onShowProfileDetails?() },
+            onSettingsTap: { [weak self] in self?.onShowSettings?() },
+            onChangePasswordTap: { [weak self] in self?.onShowEditProfile?() },
+            onLogoutTap: { [weak self] in self?.showLogoutAlert() }
+        )
 
-        profileView.onOpenSettings = { [weak self] in
-            self?.onShowSettings?()
-        }
+        let hostingController = UIHostingController(rootView: rootView)
+        self.hostingController = hostingController
 
-        profileView.onOpenProfileDetails = { [weak self] in
-            self?.onShowProfileDetails?()
-        }
-
-        profileView.onOpenSupport = { [weak self] in
-            self?.onShowSupport?()
-        }
-
-        profileView.onAvatarTapped = { [weak self] in
-            self?.openPhotoLibrary()
-        }
-
-        // Logout с алертом (1 раз!)
-        profileView.onLogoutTapped = { [weak self] in
-            self?.showLogoutAlert()
-        }
+        addChild(hostingController)
+        view.addSubview(hostingController.view)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        hostingController.didMove(toParent: self)
     }
 
     // MARK: - Photo Picker
@@ -101,7 +95,7 @@ extension ProfileViewController: PHPickerViewControllerDelegate {
             guard let image = image as? UIImage else { return }
 
             DispatchQueue.main.async {
-                self?.profileView.headerView.updateAvatar(image: image)
+                self?.profileScreenViewModel.avatarImage = image
             }
         }
     }

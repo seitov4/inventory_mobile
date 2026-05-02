@@ -72,7 +72,7 @@ struct MyEnterpriseScreen: View {
                 }
             }
         }
-        .navigationTitle("Мое предприятие")
+        .navigationTitle("Моё предприятие")
     }
 }
 
@@ -124,4 +124,3 @@ private struct InfoRow: View {
         .padding(.vertical, 2)
     }
 }
-
