@@ -29,7 +29,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>InventiX может сохранять изображения, прикрепленные в AI чат.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>InventiX использует камеру для добавления фото в AI чат.</string>
+	<string>InventiX использует камеру для сканирования штрих-кодов и добавления фото в AI чат.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>InventiX использует Face ID / Touch ID для быстрого и безопасного входа в приложение.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

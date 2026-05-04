@@ -23,8 +23,8 @@ final class QuickSaleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-        navigationItem.title = "Быстрая продажа"
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.title = nil
+        navigationItem.largeTitleDisplayMode = .never
 
         let root = QuickSaleScreen(viewModel: viewModel)
         let host = UIHostingController(rootView: root)
@@ -41,5 +41,15 @@ final class QuickSaleViewController: UIViewController {
             host.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         host.didMove(toParent: self)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 }
