@@ -96,6 +96,12 @@ struct SettingsScreen: View {
             }
 
             Section("Безопасность") {
+                NavigationLink {
+                    PasscodeChangeScreen(viewModel: PasscodeChangeViewModel(authManager: .shared))
+                } label: {
+                    Label("Сменить код-пароль", systemImage: "lock.rotation")
+                }
+
                 Toggle("Login with Face ID / Touch ID", isOn: Binding(
                     get: { viewModel.biometricsOn },
                     set: { viewModel.setBiometrics($0) }

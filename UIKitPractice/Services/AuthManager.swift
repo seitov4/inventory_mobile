@@ -50,6 +50,12 @@ final class AuthManager {
         keychain.saveString(hash, key: passcodeHashKey)
     }
 
+    func changePasscode(currentPasscode: String, newPasscode: String) throws -> Bool {
+        guard verifyPasscode(currentPasscode) else { return false }
+        try setPasscode(newPasscode)
+        return true
+    }
+
     func verifyPasscode(_ passcode: String) -> Bool {
         guard let salt = keychain.getString(key: passcodeSaltKey),
               let storedHash = keychain.getString(key: passcodeHashKey) else { return false }
@@ -112,4 +118,3 @@ private extension AuthManager {
         return Data(digest).base64EncodedString()
     }
 }
-

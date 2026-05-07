@@ -21,6 +21,7 @@ final class ProfileViewController: UIViewController {
     var onShowEditProfile: (() -> Void)?
     var onShowProfileDetails: (() -> Void)?
     var onShowEnterprise: (() -> Void)?
+    var onShowPasscodeChange: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +36,7 @@ final class ProfileViewController: UIViewController {
             onEnterpriseTap: { [weak self] in self?.onShowEnterprise?() },
             onPersonalDataTap: { [weak self] in self?.onShowProfileDetails?() },
             onSettingsTap: { [weak self] in self?.onShowSettings?() },
-            onChangePasswordTap: { [weak self] in self?.onShowEditProfile?() },
+            onChangePasswordTap: { [weak self] in self?.onShowPasscodeChange?() },
             onLogoutTap: { [weak self] in self?.showLogoutAlert() }
         )
 

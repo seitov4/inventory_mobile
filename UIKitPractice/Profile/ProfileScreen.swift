@@ -127,7 +127,7 @@ struct ProfileScreen: View {
 
                     ProfileActionRow(
                         icon: "lock.fill",
-                        title: "Сменить пароль",
+                        title: "Сменить код-пароль",
                         value: nil,
                         showsChevron: true,
                         action: onChangePasswordTap

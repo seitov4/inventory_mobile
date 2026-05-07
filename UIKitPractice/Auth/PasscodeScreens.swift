@@ -257,6 +257,211 @@ struct PasscodeUnlockScreen: View {
     }
 }
 
+@MainActor
+final class PasscodeChangeViewModel: ObservableObject {
+    enum Step: Int {
+        case current = 1
+        case new = 2
+        case confirm = 3
+    }
+
+    @Published var step: Step = .current
+    @Published var currentPasscode: String = ""
+    @Published var newPasscode: String = ""
+    @Published var confirmation: String = ""
+    @Published var errorMessage: String?
+    @Published var showSuccess: Bool = false
+    @Published var shakeTrigger: Int = 0
+
+    private let authManager: AuthManager
+
+    init(authManager: AuthManager) {
+        self.authManager = authManager
+    }
+
+    var title: String {
+        switch step {
+        case .current: return "Введите текущий код"
+        case .new: return "Введите новый код"
+        case .confirm: return "Повторите новый код"
+        }
+    }
+
+    var subtitle: String {
+        switch step {
+        case .current: return "Это нужно, чтобы защитить доступ к приложению."
+        case .new: return "Код должен состоять из 6 цифр."
+        case .confirm: return "Повторите код, чтобы исключить ошибку."
+        }
+    }
+
+    var buttonTitle: String {
+        step == .confirm ? "Сохранить код" : "Продолжить"
+    }
+
+    var entry: Binding<String> {
+        Binding(
+            get: { [weak self] in
+                guard let self else { return "" }
+                switch self.step {
+                case .current: return self.currentPasscode
+                case .new: return self.newPasscode
+                case .confirm: return self.confirmation
+                }
+            },
+            set: { [weak self] newValue in
+                guard let self else { return }
+                switch self.step {
+                case .current: self.currentPasscode = newValue
+                case .new: self.newPasscode = newValue
+                case .confirm: self.confirmation = newValue
+                }
+            }
+        )
+    }
+
+    func submit() {
+        errorMessage = nil
+
+        switch step {
+        case .current:
+            guard currentPasscode.count == 6 else {
+                fail("Введите 6-значный код")
+                return
+            }
+
+            guard authManager.verifyPasscode(currentPasscode) else {
+                currentPasscode = ""
+                fail("Неверный текущий код")
+                return
+            }
+
+            step = .new
+
+        case .new:
+            guard newPasscode.count == 6 else {
+                fail("Введите 6-значный код")
+                return
+            }
+
+            guard newPasscode != currentPasscode else {
+                newPasscode = ""
+                fail("Новый код должен отличаться от текущего")
+                return
+            }
+
+            step = .confirm
+
+        case .confirm:
+            guard confirmation.count == 6 else {
+                fail("Введите 6-значный код")
+                return
+            }
+
+            guard confirmation == newPasscode else {
+                confirmation = ""
+                fail("Коды не совпадают")
+                return
+            }
+
+            do {
+                let changed = try authManager.changePasscode(currentPasscode: currentPasscode, newPasscode: newPasscode)
+                guard changed else {
+                    reset()
+                    fail("Текущий код больше не подходит. Попробуйте снова.")
+                    return
+                }
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                showSuccess = true
+            } catch {
+                fail("Не удалось сохранить код. Повторите.")
+            }
+        }
+    }
+
+    func reset() {
+        step = .current
+        currentPasscode = ""
+        newPasscode = ""
+        confirmation = ""
+    }
+
+    private func fail(_ message: String) {
+        errorMessage = message
+        UINotificationFeedbackGenerator().notificationOccurred(.error)
+        withAnimation(.default) { shakeTrigger += 1 }
+    }
+}
+
+struct PasscodeChangeScreen: View {
+    @ObservedObject var viewModel: PasscodeChangeViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Spacer(minLength: 28)
+
+            Image(systemName: "lock.rotation")
+                .font(.system(size: 34, weight: .semibold))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 72, height: 72)
+                .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+            VStack(spacing: 7) {
+                Text(viewModel.title)
+                    .font(.title3.weight(.semibold))
+                    .multilineTextAlignment(.center)
+
+                Text(viewModel.subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+            }
+
+            PinEntryField(code: viewModel.entry, length: 6) {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.submit()
+                }
+            }
+            .modifier(ShakeEffect(animatableData: CGFloat(viewModel.shakeTrigger)))
+            .padding(.top, 8)
+
+            if let error = viewModel.errorMessage {
+                Text(error)
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
+            Button(viewModel.buttonTitle) {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.submit()
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .padding(.horizontal, 24)
+            .padding(.top, 4)
+
+            Spacer(minLength: 0)
+        }
+        .navigationTitle("Смена код-пароля")
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(.systemBackground))
+        .animation(.easeInOut(duration: 0.2), value: viewModel.step.rawValue)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
+        .alert("Код-пароль изменён", isPresented: $viewModel.showSuccess) {
+            Button("OK") { dismiss() }
+        } message: {
+            Text("Теперь для входа в InventiX используйте новый код.")
+        }
+    }
+}
+
 struct PinEntryField: View {
     @Binding var code: String
     let length: Int
@@ -313,4 +518,3 @@ struct ShakeEffect: GeometryEffect {
         ProjectionTransform(CGAffineTransform(translationX: amount * sin(animatableData * .pi * shakesPerUnit), y: 0))
     }
 }
-

@@ -35,6 +35,12 @@ final class ProfileCoordinator: Coordinator {
             self.navigationController.pushViewController(vc, animated: true)
         }
 
+        profileVC.onShowPasscodeChange = { [weak self] in
+            guard let self else { return }
+            let vc = UIHostingController(rootView: PasscodeChangeScreen(viewModel: PasscodeChangeViewModel(authManager: .shared)))
+            self.navigationController.pushViewController(vc, animated: true)
+        }
+
         profileVC.onShowSupport = { [weak self] in
             guard let self else { return }
             let vc = SupportViewController()
