@@ -96,7 +96,7 @@ extension ProfileViewController: PHPickerViewControllerDelegate {
             guard let image = image as? UIImage else { return }
 
             DispatchQueue.main.async {
-                self?.profileScreenViewModel.avatarImage = image
+                self?.profileScreenViewModel.updateAvatar(image)
             }
         }
     }

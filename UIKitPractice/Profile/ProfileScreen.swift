@@ -12,13 +12,16 @@ final class ProfileScreenViewModel: ObservableObject {
     @Published var avatarImage: UIImage?
     @Published var enterpriseViewModel: MyEnterpriseViewModel
 
+    private let avatarStore: ProfileAvatarStoring
+
     init(
         fullName: String = "Иван Иванов",
         email: String = "ivan@example.com",
         phone: String = "+7 700 123 45 67",
         role: String = "Администратор",
         position: String = "Управляющий магазином",
-        enterpriseViewModel: MyEnterpriseViewModel? = nil
+        enterpriseViewModel: MyEnterpriseViewModel? = nil,
+        avatarStore: ProfileAvatarStoring? = nil
     ) {
         self.fullName = fullName
         self.email = email
@@ -26,6 +29,9 @@ final class ProfileScreenViewModel: ObservableObject {
         self.role = role
         self.position = position
         self.enterpriseViewModel = enterpriseViewModel ?? MyEnterpriseViewModel.mock()
+        let avatarStore = avatarStore ?? ProfileAvatarStore.shared
+        self.avatarStore = avatarStore
+        self.avatarImage = avatarStore.loadAvatar()
     }
 
     var initials: String {
@@ -36,6 +42,21 @@ final class ProfileScreenViewModel: ObservableObject {
             .map(String.init)
             .joined()
             .uppercased()
+    }
+
+    func updateAvatar(_ image: UIImage) {
+        avatarImage = image
+
+        do {
+            try avatarStore.saveAvatar(image)
+        } catch {
+            // Keep the freshly selected avatar in memory even if disk persistence fails.
+        }
+    }
+
+    func deleteAvatar() {
+        avatarImage = nil
+        try? avatarStore.deleteAvatar()
     }
 }
 
@@ -60,7 +81,8 @@ struct ProfileScreen: View {
                     role: viewModel.role,
                     initials: viewModel.initials,
                     avatarImage: viewModel.avatarImage,
-                    onAvatarTap: onAvatarTap
+                    onAvatarTap: onAvatarTap,
+                    onDeleteAvatarTap: { viewModel.deleteAvatar() }
                 )
                 .profileAppear(index: 0, active: hasAppeared)
 
@@ -167,43 +189,61 @@ private struct ProfileHeaderCard: View {
     let initials: String
     let avatarImage: UIImage?
     let onAvatarTap: () -> Void
+    let onDeleteAvatarTap: () -> Void
+
+    private let avatarSize: CGFloat = 88
 
     var body: some View {
-        VStack(spacing: 12) {
-            Button(action: onAvatarTap) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.accentColor.opacity(0.95),
-                                    Color.accentColor.opacity(0.55)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+        VStack(spacing: 14) {
+            VStack(spacing: 8) {
+                Button(action: onAvatarTap) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.accentColor.opacity(0.95),
+                                        Color.accentColor.opacity(0.55)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .frame(width: 72, height: 72)
+                            .frame(width: avatarSize, height: avatarSize)
 
-                    if let avatarImage {
-                        Image(uiImage: avatarImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 72, height: 72)
-                            .clipShape(Circle())
-                    } else {
-                        Text(initials)
-                            .font(.system(size: 26, weight: .bold))
-                            .foregroundStyle(.white)
+                        if let avatarImage {
+                            Image(uiImage: avatarImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: avatarSize, height: avatarSize)
+                                .clipShape(Circle())
+                        } else {
+                            Text(initials)
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .overlay(
+                        Circle()
+                            .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Изменить фото профиля")
+
+                HStack(spacing: 12) {
+                    Button("Изменить фото", action: onAvatarTap)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
+
+                    if avatarImage != nil {
+                        Button("Удалить", action: onDeleteAvatarTap)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.red)
+                            .transition(.opacity.combined(with: .scale))
                     }
                 }
-                .overlay(
-                    Circle()
-                        .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
-                )
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Изменить фото профиля")
 
             VStack(spacing: 7) {
                 Text(fullName)
