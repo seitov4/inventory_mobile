@@ -25,7 +25,7 @@ final class EditProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Редактировать"
+        title = L10n.tr("edit_profile.title")
 
         view.backgroundColor = .systemBackground
         
@@ -44,8 +44,8 @@ final class EditProfileViewController: UIViewController {
         )
         
         // Показываем успех
-        let alert = UIAlertController(title: "Готово", message: "Изменения сохранены", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default))
+        let alert = UIAlertController(title: L10n.tr("common.ready"), message: L10n.tr("edit_profile.saved"), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L10n.tr("common.ok"), style: .default))
         present(alert, animated: true)
         
         // Возвращаемся назад

@@ -13,7 +13,7 @@ final class LoginView: UIView {
     let titleLabel = UILabel()
     let subtitleLabel = UILabel()
 
-    let loginTypeSegmented = UISegmentedControl(items: ["Email", "Телефон"])
+    let loginTypeSegmented = UISegmentedControl(items: ["Email", L10n.tr("Телефон")])
 
     let loginField = UITextField()
     let passwordField = UITextField()
@@ -52,7 +52,7 @@ final class LoginView: UIView {
         titleLabel.font = .systemFont(ofSize: 36, weight: .bold)
         titleLabel.textAlignment = .center
 
-        subtitleLabel.text = "Система учёта товаров"
+        subtitleLabel.text = L10n.tr("auth.app_subtitle")
         subtitleLabel.font = .systemFont(ofSize: 18)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
@@ -71,7 +71,7 @@ final class LoginView: UIView {
         errorLabel.isHidden = true
 
         loginButton.configuration = makeFilledButtonConfiguration(
-            title: "Войти",
+            title: L10n.tr("Войти"),
             foregroundColor: .white,
             fontSize: 18,
             fontWeight: .semibold
@@ -79,7 +79,7 @@ final class LoginView: UIView {
         loginButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
 
         biometryButton.configuration = makeFilledButtonConfiguration(
-            title: "Войти с Face ID / Touch ID",
+            title: L10n.tr("auth.sign_in_biometrics"),
             foregroundColor: .label,
             fontSize: 16,
             fontWeight: .medium,
@@ -88,7 +88,7 @@ final class LoginView: UIView {
         biometryButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
 
         forgotPasswordButton.configuration = .plain()
-        forgotPasswordButton.configuration?.title = "Забыли пароль?"
+        forgotPasswordButton.configuration?.title = L10n.tr("Забыли пароль?")
 
         let headerStack = UIStackView(arrangedSubviews: [
             logoImageView, titleLabel, subtitleLabel
@@ -142,7 +142,7 @@ final class LoginView: UIView {
             loginField.keyboardType = .emailAddress
             loginField.leftView = createIconView(iconName: "envelope")
         case .phone:
-            loginField.placeholder = "Номер телефона"
+            loginField.placeholder = L10n.tr("Номер телефона")
             loginField.keyboardType = .phonePad
             loginField.leftView = createIconView(iconName: "phone")
         }

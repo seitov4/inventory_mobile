@@ -15,15 +15,15 @@ final class MockAIChatService: AIChatServiceProtocol {
 
         let lower = userInput.lowercased()
         if lower.contains("продаж") || lower.contains("выручк") {
-            return "За последние 7 дней просадка обычно связана с 1-2 категориями. Рекомендую проверить маржинальность «Напитки», запустить акцию 2+1 на slow-moving SKU и повторно оценить конверсию через 3 дня."
+            return L10n.tr("analytics.ai.reply.sales")
         }
         if lower.contains("спрос") || lower.contains("прогноз") {
-            return "По текущему тренду спроса стоит увеличить закуп по топ-20 SKU на 12-15% перед выходными. Для снижения out-of-stock приоритет: напитки, снеки, молочная группа."
+            return L10n.tr("analytics.ai.reply.demand")
         }
         if lower.contains("сотрудник") || lower.contains("касс") {
-            return "Попробуйте сравнить продажи по сменам и средний чек по кассирам. Часто рост дает скрипт апсейла и контроль очередей в часы пик."
+            return L10n.tr("analytics.ai.reply.staff")
         }
-        return "Могу помочь с идеями по выручке, ассортименту, сезонности, акциям и прогнозу спроса. Напишите, какой показатель хотите улучшить."
+        return L10n.tr("analytics.ai.reply.default")
     }
 }
 
@@ -41,4 +41,3 @@ final class RemoteAIChatService: AIChatServiceProtocol {
         )
     }
 }
-

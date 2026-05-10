@@ -14,7 +14,7 @@ final class MockProductsService {
         searchQuery: String? = nil,
         completion: @escaping (Result<ProductsResponse, Error>) -> Void
     ) {
-        // Имитация задержки сети
+        // TODO: Connect to API
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let mockProducts = self.generateMockProducts()
             let filteredProducts = self.filterProducts(mockProducts, category: category, searchQuery: searchQuery)
@@ -33,12 +33,12 @@ final class MockProductsService {
     
     private func generateMockProducts() -> [Product] {
         return [
-            Product(id: 1, name: "Молоко 3.2%", barcode: "4600123456789", price: 89, quantity: 45, category: "Молочные", lowStockThreshold: 10),
-            Product(id: 2, name: "Сыр Российский", barcode: "4600123456790", price: 459, quantity: 8, category: "Молочные", lowStockThreshold: 10),
-            Product(id: 3, name: "Хлеб белый", barcode: "4600123456791", price: 45, quantity: 12, category: "Хлеб", lowStockThreshold: 15),
-            Product(id: 4, name: "Колбаса Докторская", barcode: "4600123456792", price: 389, quantity: 5, category: "Мясные", lowStockThreshold: 10),
-            Product(id: 5, name: "Вода минеральная", barcode: "4600123456793", price: 35, quantity: 120, category: "Напитки", lowStockThreshold: 20),
-            Product(id: 6, name: "Кофе растворимый", barcode: "4600123456794", price: 299, quantity: 3, category: "Напитки", lowStockThreshold: 10)
+            Product(id: 1, name: L10n.tr("product.mock.milk"), barcode: "4600123456789", price: 89, quantity: 45, category: L10n.tr("product.category.dairy"), lowStockThreshold: 10),
+            Product(id: 2, name: L10n.tr("product.mock.cheese"), barcode: "4600123456790", price: 459, quantity: 8, category: L10n.tr("product.category.dairy"), lowStockThreshold: 10),
+            Product(id: 3, name: L10n.tr("product.mock.bread"), barcode: "4600123456791", price: 45, quantity: 12, category: L10n.tr("product.category.bread"), lowStockThreshold: 15),
+            Product(id: 4, name: L10n.tr("product.mock.sausage"), barcode: "4600123456792", price: 389, quantity: 5, category: L10n.tr("product.category.meat"), lowStockThreshold: 10),
+            Product(id: 5, name: L10n.tr("product.mock.water"), barcode: "4600123456793", price: 35, quantity: 120, category: L10n.tr("product.category.drinks"), lowStockThreshold: 20),
+            Product(id: 6, name: L10n.tr("product.mock.coffee"), barcode: "4600123456794", price: 299, quantity: 3, category: L10n.tr("product.category.drinks"), lowStockThreshold: 10)
         ]
     }
     

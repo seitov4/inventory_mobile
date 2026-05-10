@@ -32,7 +32,7 @@ final class DashboardViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onUpdate = { [weak self] in
             guard let self = self else { return }
-            self.rootView.summaryLabel.text = "Продаж за сегодня: \(AppCurrency.string(from: self.viewModel.todaySales))"
+            self.rootView.summaryLabel.text = L10n.format("dashboard.sales_today_format", AppCurrency.string(from: self.viewModel.todaySales))
         }
     }
 }

@@ -25,7 +25,7 @@ struct AIChatAttachment: Identifiable, Equatable {
 final class AIChatViewModel: ObservableObject {
     @Published var messages: [AIChatMessage] = [
         AIChatMessage(
-            text: "Привет! Я AI-помощник InventiX. Могу подсказать идеи для роста выручки, анализ категорий и прогноз спроса.",
+            text: L10n.tr("analytics.ai.greeting"),
             isUser: false
         )
     ]
@@ -35,7 +35,7 @@ final class AIChatViewModel: ObservableObject {
 
     private let service: AIChatServiceProtocol
     private var turns: [AIChatTurn] = [
-        .init(role: "assistant", content: "Привет! Я AI-помощник InventiX. Могу подсказать идеи для роста выручки, анализ категорий и прогноз спроса.")
+        .init(role: "assistant", content: L10n.tr("analytics.ai.greeting"))
     ]
 
     init(service: AIChatServiceProtocol = MockAIChatService()) {
@@ -48,8 +48,8 @@ final class AIChatViewModel: ObservableObject {
 
         let attachmentSuffix = pendingAttachments.isEmpty
             ? ""
-            : "\n\nВложения: \(pendingAttachments.map(\.name).joined(separator: ", "))"
-        let userTextForChat = text.isEmpty ? "Отправлены вложения." : text
+            : L10n.format("analytics.ai.attachments_format", pendingAttachments.map(\.name).joined(separator: ", "))
+        let userTextForChat = text.isEmpty ? L10n.tr("analytics.ai.attachments_sent") : text
         let presentedText = userTextForChat + attachmentSuffix
 
         messages.append(AIChatMessage(text: presentedText, isUser: true))
@@ -66,7 +66,7 @@ final class AIChatViewModel: ObservableObject {
                 self.messages.append(AIChatMessage(text: reply, isUser: false))
                 self.isTyping = false
             } catch {
-                self.messages.append(AIChatMessage(text: "Не удалось получить ответ AI. Попробуйте снова.", isUser: false))
+                self.messages.append(AIChatMessage(text: L10n.tr("analytics.ai.error"), isUser: false))
                 self.isTyping = false
             }
         }
@@ -99,7 +99,7 @@ struct AIChatScreen: View {
             inputBar
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("AI Помощник")
+        .navigationTitle(L10n.tr("analytics.ai.title"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -126,10 +126,11 @@ struct AIChatScreen: View {
             guard !items.isEmpty else { return }
             for (index, item) in items.enumerated() {
                 let extensionHint = item.supportedContentTypes.first?.preferredFilenameExtension?.uppercased() ?? "IMG"
-                viewModel.addPhotoAttachment(name: "Фото \(index + 1).\(extensionHint)")
+                viewModel.addPhotoAttachment(name: L10n.format("analytics.ai.photo_format", index + 1, extensionHint))
             }
             selectedPhotos.removeAll()
         }
+        .appLocalized()
     }
 
     private var messagesList: some View {
@@ -196,13 +197,13 @@ struct AIChatScreen: View {
                     Button {
                         showPhotoPicker = true
                     } label: {
-                        Label("Фото", systemImage: "photo")
+                        Label(L10n.tr("analytics.ai.photo"), systemImage: "photo")
                     }
 
                     Button {
                         showFileImporter = true
                     } label: {
-                        Label("Файл", systemImage: "doc")
+                        Label(L10n.tr("analytics.ai.file"), systemImage: "doc")
                     }
                 } label: {
                     Image(systemName: "plus")
@@ -212,7 +213,7 @@ struct AIChatScreen: View {
                         .background(Circle().fill(Color(.secondarySystemBackground)))
                 }
 
-                TextField("Напишите запрос по аналитике...", text: $viewModel.inputText, axis: .vertical)
+                TextField(L10n.tr("analytics.ai.placeholder"), text: $viewModel.inputText, axis: .vertical)
                     .lineLimit(1...4)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
@@ -313,4 +314,3 @@ private struct AITypingBubble: View {
         }
     }
 }
-

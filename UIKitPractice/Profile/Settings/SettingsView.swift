@@ -23,7 +23,7 @@ final class SettingsView: UIView {
     // MARK: - UI Elements
     let editProfileButton: UIButton = {
         let b = UIButton(type: .system)
-        b.setTitle("Редактировать профиль", for: .normal)
+        b.setTitle(L10n.tr("profile.edit_profile"), for: .normal)
         b.titleLabel?.font = .boldSystemFont(ofSize: 18)
         return b
     }()
@@ -90,7 +90,7 @@ final class SettingsView: UIView {
 
     // mapping helpers
     private func segmentIndex(forAppearanceRaw raw: Int) -> Int {
-        // ProfileSegmentCell items originally were ["Светлая","Тёмная","Системная"]
+        // ProfileSegmentCell items are ordered as [Light, Dark, System].
         // Мы хотим передать на сегмент порядок: [Light(0), Dark(1), System(2)] => cell expects [Light(0), Dark(1), System(2)]
         // But AppTheme.raw is [System(0), Light(1), Dark(2)]
         // So mapping AppTheme -> cellIndex:
@@ -120,9 +120,9 @@ extension SettingsView: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch Section(rawValue: section)! {
-        case .notifications: return "Уведомления"
-        case .appearance: return "Внешний вид"
-        case .security: return "Безопасность"
+        case .notifications: return L10n.tr("settings.notifications.section")
+        case .appearance: return L10n.tr("settings.appearance.section")
+        case .security: return L10n.tr("settings.security.section")
         }
     }
 
@@ -130,14 +130,14 @@ extension SettingsView: UITableViewDataSource, UITableViewDelegate {
         switch Section(rawValue: indexPath.section)! {
         case .notifications:
             let cell = tableView.dequeueReusableCell(withIdentifier: ProfileSwitchCell.reuseIdentifier, for: indexPath) as! ProfileSwitchCell
-            cell.configure(icon: UIImage(systemName: "bell"), title: "Уведомления", isOn: currentNotifications)
+            cell.configure(icon: UIImage(systemName: "bell"), title: L10n.tr("settings.notifications.toggle"), isOn: currentNotifications)
             cell.onToggle = { [weak self] isOn in self?.onToggleNotifications?(isOn) }
             return cell
 
         case .appearance:
             let cell = tableView.dequeueReusableCell(withIdentifier: ProfileSegmentCell.reuseIdentifier, for: indexPath) as! ProfileSegmentCell
             let mappedIndex = segmentIndex(forAppearanceRaw: currentAppearance)
-            cell.configure(icon: UIImage(systemName: "moon"), title: "Тема", selectedIndex: mappedIndex)
+            cell.configure(icon: UIImage(systemName: "moon"), title: L10n.tr("settings.theme.title"), selectedIndex: mappedIndex)
             cell.onSegmentChanged = { [weak self] segIdx in
                 guard let self = self else { return }
                 let raw = self.appearanceRaw(forSegmentIndex: segIdx)
@@ -148,7 +148,7 @@ extension SettingsView: UITableViewDataSource, UITableViewDelegate {
         case .security:
             let cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
             var cfg = cell.defaultContentConfiguration()
-            cfg.text = "Сменить пароль"
+            cfg.text = L10n.tr("settings.change_passcode")
             cfg.image = UIImage(systemName: "lock")
             cell.contentConfiguration = cfg
             cell.accessoryType = .disclosureIndicator

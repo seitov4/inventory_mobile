@@ -69,7 +69,7 @@ final class ProfileHeaderView: UIView {
         emailLabel.font = .systemFont(ofSize: 14)
         emailLabel.textColor = .secondaryLabel
 
-        editButton.setTitle("Редактировать", for: .normal)
+        editButton.setTitle(L10n.tr("profile.edit"), for: .normal)
         editButton.addTarget(self, action: #selector(editTapped), for: .touchUpInside)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(avatarTapped))

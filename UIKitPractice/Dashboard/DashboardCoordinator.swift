@@ -18,7 +18,7 @@ final class DashboardCoordinator: Coordinator {
     func start() {
         let vm = DashboardViewModel()
         let vc = DashboardViewController(viewModel: vm)
-        vc.title = "Дашборд"
+        vc.title = L10n.tr("dashboard.title")
         navigationController.pushViewController(vc, animated: true)
     }
 }

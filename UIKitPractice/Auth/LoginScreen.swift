@@ -26,16 +26,16 @@ final class LoginScreenViewModel: ObservableObject {
         switch loginType {
         case .email:
             let value = email.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !value.isEmpty else { errorMessage = "Введите email"; return }
+            guard !value.isEmpty else { errorMessage = L10n.tr("Введите email"); return }
             loginValue = value
         case .phone:
             let value = phone.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !value.isEmpty else { errorMessage = "Введите номер телефона"; return }
+            guard !value.isEmpty else { errorMessage = L10n.tr("Введите номер телефона"); return }
             loginValue = value
         }
 
         guard !password.isEmpty else {
-            errorMessage = "Введите пароль"
+            errorMessage = L10n.tr("Введите пароль")
             return
         }
 
@@ -80,7 +80,7 @@ struct LoginScreen: View {
             VStack(spacing: 12) {
                 Picker("", selection: $viewModel.loginType) {
                     Text("Email").tag(LoginType.email)
-                    Text("Телефон").tag(LoginType.phone)
+                    Text(L10n.tr("Телефон")).tag(LoginType.phone)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 24)
@@ -96,7 +96,7 @@ struct LoginScreen: View {
                         .onSubmit { focus = .password }
                         .modifier(AuthTextFieldStyle())
                 } else {
-                    TextField("Номер телефона", text: $viewModel.phone)
+                    TextField(L10n.tr("Номер телефона"), text: $viewModel.phone)
                         .textContentType(.telephoneNumber)
                         .keyboardType(.phonePad)
                         .textInputAutocapitalization(.never)
@@ -107,7 +107,7 @@ struct LoginScreen: View {
                         .modifier(AuthTextFieldStyle())
                 }
 
-                SecureField("Пароль", text: $viewModel.password)
+                SecureField(L10n.tr("Пароль"), text: $viewModel.password)
                     .textContentType(.password)
                     .focused($focus, equals: .password)
                     .submitLabel(.go)
@@ -133,7 +133,7 @@ struct LoginScreen: View {
                     if viewModel.isLoading {
                         ProgressView().tint(.white)
                     } else {
-                        Text("Войти")
+                        Text(L10n.tr("Войти"))
                             .font(.system(size: 17, weight: .semibold))
                     }
                 }
@@ -146,9 +146,9 @@ struct LoginScreen: View {
             .padding(.horizontal, 24)
             .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
 
-            Button("Забыли пароль?") {
+            Button(L10n.tr("Забыли пароль?")) {
                 withAnimation(.easeInOut(duration: 0.2)) {
-                    viewModel.errorMessage = "Восстановление пароля будет добавлено после подключения backend API."
+                    viewModel.errorMessage = L10n.tr("auth.password_recovery_todo")
                 }
             }
             .buttonStyle(.plain)
@@ -160,6 +160,7 @@ struct LoginScreen: View {
         .background(Color(.systemBackground))
         .onAppear { focus = .email }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
+        .appLocalized()
     }
 }
 
@@ -177,4 +178,3 @@ private struct AuthTextFieldStyle: ViewModifier {
             .padding(.horizontal, 24)
     }
 }
-

@@ -44,7 +44,7 @@ final class PasscodeSetupViewModel: ObservableObject {
         let confirm = confirmation
 
         guard code.count == 6 else {
-            errorMessage = "Введите 6-значный код"
+            errorMessage = L10n.tr("auth.enter_6_digits")
             return
         }
 
@@ -54,7 +54,7 @@ final class PasscodeSetupViewModel: ObservableObject {
         }
 
         guard confirm == code else {
-            errorMessage = "Коды не совпадают"
+            errorMessage = L10n.tr("auth.passcodes_mismatch")
             confirmation = ""
             return
         }
@@ -63,7 +63,7 @@ final class PasscodeSetupViewModel: ObservableObject {
             try authManager.setPasscode(code)
             showBiometricsPrompt = true
         } catch {
-            errorMessage = "Не удалось сохранить код. Повторите."
+            errorMessage = L10n.tr("auth.save_passcode_failed")
         }
     }
 
@@ -95,11 +95,11 @@ struct PasscodeSetupScreen: View {
             Text("InventiX")
                 .font(.system(size: 34, weight: .bold))
 
-            Text(viewModel.isExistingUser ? "С возвращением!" : "Добро пожаловать")
+            Text(viewModel.isExistingUser ? L10n.tr("auth.welcome_back") : L10n.tr("auth.welcome"))
                 .font(.title3.weight(.semibold))
                 .padding(.top, 2)
 
-            Text(viewModel.step == 1 ? "Установите 6‑значный код‑пароль" : "Повторите код‑пароль")
+            Text(viewModel.step == 1 ? L10n.tr("auth.setup_passcode") : L10n.tr("auth.repeat_passcode"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -117,7 +117,7 @@ struct PasscodeSetupScreen: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
 
-            Button(viewModel.step == 1 ? "Продолжить" : "Сохранить") {
+            Button(viewModel.step == 1 ? L10n.tr("auth.continue") : L10n.tr("auth.save")) {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     viewModel.submit(onFinished: onFinished)
                 }
@@ -132,17 +132,18 @@ struct PasscodeSetupScreen: View {
         .background(Color(.systemBackground))
         .animation(.easeInOut(duration: 0.2), value: viewModel.step)
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
-        .alert("Использовать Face ID / Touch ID?", isPresented: $viewModel.showBiometricsPrompt) {
-            Button("Да") { viewModel.biometricsChoice(enable: true, onFinished: onFinished) }
-            Button("Нет", role: .cancel) { viewModel.biometricsChoice(enable: false, onFinished: onFinished) }
+        .alert(L10n.tr("settings.biometrics.alert_title"), isPresented: $viewModel.showBiometricsPrompt) {
+            Button(L10n.tr("common.yes")) { viewModel.biometricsChoice(enable: true, onFinished: onFinished) }
+            Button(L10n.tr("common.no"), role: .cancel) { viewModel.biometricsChoice(enable: false, onFinished: onFinished) }
         } message: {
-            Text("Вы сможете изменить это в настройках позже.")
+            Text(L10n.tr("auth.use_biometrics_message"))
         }
-        .alert("Информация", isPresented: $viewModel.showMessageAlert) {
-            Button("OK", role: .cancel) {}
+        .alert(L10n.tr("common.info"), isPresented: $viewModel.showMessageAlert) {
+            Button(L10n.tr("common.ok"), role: .cancel) {}
         } message: {
             Text(viewModel.messageAlertText)
         }
+        .appLocalized()
     }
 }
 
@@ -165,7 +166,7 @@ final class PasscodeUnlockViewModel: ObservableObject {
         guard !isEvaluating else { return }
         errorMessage = nil
         guard code.count == 6 else {
-            errorMessage = "Введите 6-значный код"
+            errorMessage = L10n.tr("auth.enter_6_digits")
             return
         }
         isEvaluating = true
@@ -174,8 +175,8 @@ final class PasscodeUnlockViewModel: ObservableObject {
         guard authManager.verifyPasscode(code) else {
             failedAttempts += 1
             errorMessage = failedAttempts < 5
-            ? "Неверный код. Попробуйте ещё раз."
-            : "Превышено число попыток. Войдите заново."
+            ? L10n.tr("auth.invalid_passcode")
+            : L10n.tr("auth.too_many_attempts")
 
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             withAnimation(.default) { shakeTrigger += 1 }
@@ -200,14 +201,14 @@ final class PasscodeUnlockViewModel: ObservableObject {
         isBiometricsInProgress = true
         Task { [weak self] in
             guard let self else { return }
-            let result = await self.authManager.authenticateWithBiometrics(reason: "Разблокировать InventiX")
+            let result = await self.authManager.authenticateWithBiometrics(reason: L10n.tr("auth.unlock_reason"))
             await MainActor.run {
                 self.isBiometricsInProgress = false
                 switch result {
                 case .success:
                     onUnlocked()
                 case .failure:
-                    self.errorMessage = "Не удалось использовать биометрию. Введите код‑пароль."
+                    self.errorMessage = L10n.tr("auth.biometry_use_failed")
                 }
             }
         }
@@ -226,11 +227,11 @@ struct PasscodeUnlockScreen: View {
             Text("InventiX")
                 .font(.system(size: 34, weight: .bold))
 
-            Text("С возвращением!")
+            Text(L10n.tr("auth.welcome_back"))
                 .font(.title3.weight(.semibold))
                 .padding(.top, 2)
 
-            Text("Введите код‑пароль")
+            Text(L10n.tr("auth.enter_passcode"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -254,6 +255,7 @@ struct PasscodeUnlockScreen: View {
         .background(Color(.systemBackground))
         .onAppear { viewModel.tryBiometrics(onUnlocked: onUnlocked) }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
+        .appLocalized()
     }
 }
 
@@ -281,22 +283,22 @@ final class PasscodeChangeViewModel: ObservableObject {
 
     var title: String {
         switch step {
-        case .current: return "Введите текущий код"
-        case .new: return "Введите новый код"
-        case .confirm: return "Повторите новый код"
+        case .current: return L10n.tr("auth.change.current_title")
+        case .new: return L10n.tr("auth.change.new_title")
+        case .confirm: return L10n.tr("auth.change.confirm_title")
         }
     }
 
     var subtitle: String {
         switch step {
-        case .current: return "Это нужно, чтобы защитить доступ к приложению."
-        case .new: return "Код должен состоять из 6 цифр."
-        case .confirm: return "Повторите код, чтобы исключить ошибку."
+        case .current: return L10n.tr("auth.change.current_subtitle")
+        case .new: return L10n.tr("auth.change.new_subtitle")
+        case .confirm: return L10n.tr("auth.change.confirm_subtitle")
         }
     }
 
     var buttonTitle: String {
-        step == .confirm ? "Сохранить код" : "Продолжить"
+        step == .confirm ? L10n.tr("auth.change.save_code") : L10n.tr("auth.continue")
     }
 
     var entry: Binding<String> {
@@ -326,13 +328,13 @@ final class PasscodeChangeViewModel: ObservableObject {
         switch step {
         case .current:
             guard currentPasscode.count == 6 else {
-                fail("Введите 6-значный код")
+                fail(L10n.tr("auth.enter_6_digits"))
                 return
             }
 
             guard authManager.verifyPasscode(currentPasscode) else {
                 currentPasscode = ""
-                fail("Неверный текущий код")
+                fail(L10n.tr("auth.change.invalid_current"))
                 return
             }
 
@@ -340,13 +342,13 @@ final class PasscodeChangeViewModel: ObservableObject {
 
         case .new:
             guard newPasscode.count == 6 else {
-                fail("Введите 6-значный код")
+                fail(L10n.tr("auth.enter_6_digits"))
                 return
             }
 
             guard newPasscode != currentPasscode else {
                 newPasscode = ""
-                fail("Новый код должен отличаться от текущего")
+                fail(L10n.tr("auth.change.same_code"))
                 return
             }
 
@@ -354,13 +356,13 @@ final class PasscodeChangeViewModel: ObservableObject {
 
         case .confirm:
             guard confirmation.count == 6 else {
-                fail("Введите 6-значный код")
+                fail(L10n.tr("auth.enter_6_digits"))
                 return
             }
 
             guard confirmation == newPasscode else {
                 confirmation = ""
-                fail("Коды не совпадают")
+                fail(L10n.tr("auth.passcodes_mismatch"))
                 return
             }
 
@@ -368,13 +370,13 @@ final class PasscodeChangeViewModel: ObservableObject {
                 let changed = try authManager.changePasscode(currentPasscode: currentPasscode, newPasscode: newPasscode)
                 guard changed else {
                     reset()
-                    fail("Текущий код больше не подходит. Попробуйте снова.")
+                    fail(L10n.tr("auth.change.current_expired"))
                     return
                 }
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                 showSuccess = true
             } catch {
-                fail("Не удалось сохранить код. Повторите.")
+                fail(L10n.tr("auth.save_passcode_failed"))
             }
         }
     }
@@ -449,16 +451,17 @@ struct PasscodeChangeScreen: View {
 
             Spacer(minLength: 0)
         }
-        .navigationTitle("Смена код-пароля")
+        .navigationTitle(L10n.tr("auth.change.title"))
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemBackground))
         .animation(.easeInOut(duration: 0.2), value: viewModel.step.rawValue)
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
-        .alert("Код-пароль изменён", isPresented: $viewModel.showSuccess) {
-            Button("OK") { dismiss() }
+        .alert(L10n.tr("auth.change.success_title"), isPresented: $viewModel.showSuccess) {
+            Button(L10n.tr("common.ok")) { dismiss() }
         } message: {
-            Text("Теперь для входа в InventiX используйте новый код.")
+            Text(L10n.tr("auth.change.success_message"))
         }
+        .appLocalized()
     }
 }
 

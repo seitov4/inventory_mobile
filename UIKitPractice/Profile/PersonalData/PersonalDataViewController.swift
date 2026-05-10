@@ -19,7 +19,7 @@ final class PersonalDataViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Личные данные"
+        title = L10n.tr("Личные данные")
         view.backgroundColor = .systemBackground
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -29,23 +29,23 @@ final class PersonalDataViewController: UIViewController {
         }
         
         contentView.update(with: [
-            ("Имя", "Ваше имя"),
-            ("Возраст", "22"),
-            ("Магазин", "TechShop"),
-            ("Должность", "Менеджер"),
+            (L10n.tr("personal.name"), L10n.tr("personal.your_name")),
+            (L10n.tr("personal.age"), "22"),
+            (L10n.tr("personal.store"), "TechShop"),
+            (L10n.tr("Должность"), L10n.tr("personal.manager")),
             ("Email", "test@mail.com"),
-            ("Телефон", "+7700 123 45 67")
+            (L10n.tr("Телефон"), "+7700 123 45 67")
         ])
     }
     private func showLogoutAlert() {
         let alert = UIAlertController(
-            title: "Выйти из аккаунта?",
-            message: "Вы точно хотите выйти?",
+            title: L10n.tr("profile.logout_title"),
+            message: L10n.tr("profile.logout_message"),
             preferredStyle: .alert
         )
 
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Выйти", style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: L10n.tr("common.cancel"), style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.tr("common.logout"), style: .destructive) { [weak self] _ in
             self?.onLogout?()
         })
 

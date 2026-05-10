@@ -14,8 +14,8 @@ struct BiometricsOptInPrompt: View {
                 // Show exactly once when this screen appears.
                 DispatchQueue.main.async { show = true }
             }
-            .alert("Использовать Face ID / Touch ID?", isPresented: $show) {
-                Button("Да") {
+            .alert(L10n.tr("settings.biometrics.alert_title"), isPresented: $show) {
+                Button(L10n.tr("common.yes")) {
                     switch authManager.biometricAvailability() {
                     case .available:
                         authManager.setBiometricsEnabled(true)
@@ -25,18 +25,17 @@ struct BiometricsOptInPrompt: View {
                         unavailableReason = reason
                     }
                 }
-                Button("Нет", role: .cancel) {
+                Button(L10n.tr("common.no"), role: .cancel) {
                     authManager.setBiometricsEnabled(false)
                     onFinished()
                 }
             } message: {
-                Text("Вы сможете изменить это в настройках позже.")
+                Text(L10n.tr("auth.use_biometrics_message"))
             }
-            .alert("Информация", isPresented: Binding(get: { unavailableReason != nil }, set: { _ in unavailableReason = nil; onFinished() })) {
-                Button("OK", role: .cancel) {}
+            .alert(L10n.tr("common.info"), isPresented: Binding(get: { unavailableReason != nil }, set: { _ in unavailableReason = nil; onFinished() })) {
+                Button(L10n.tr("common.ok"), role: .cancel) {}
             } message: {
                 Text(unavailableReason ?? "")
             }
     }
 }
-

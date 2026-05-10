@@ -52,7 +52,7 @@ final class ProductsView: UIView {
         totalProductsCard.configure(
             icon: "cube.fill",
             value: "0",
-            label: "Всего",
+            label: L10n.tr("products.total"),
             backgroundColor: .adaptiveTintBlueBackground(),
             iconColor: UIColor(red: 0.11, green: 0.48, blue: 0.96, alpha: 1.0),
             valueColor: .label,
@@ -62,7 +62,7 @@ final class ProductsView: UIView {
         lowStockCard.configure(
             icon: "exclamationmark.triangle.fill",
             value: "0",
-            label: "Мало на складе",
+            label: L10n.tr("products.low_stock"),
             backgroundColor: .adaptiveLowStockCardBackground(),
             iconColor: UIColor(red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0),
             valueColor: .label,
@@ -72,7 +72,7 @@ final class ProductsView: UIView {
         valueCard.configure(
             icon: "chart.line.uptrend.xyaxis",
             value: AppCurrency.string(from: 0),
-            label: "Сумма",
+            label: L10n.tr("products.amount"),
             backgroundColor: .secondarySystemBackground,
             iconColor: UIColor(red: 0.44, green: 0.81, blue: 0.59, alpha: 1.0),
             valueColor: .label,
@@ -82,7 +82,7 @@ final class ProductsView: UIView {
         lossesCard.configure(
             icon: "arrow.uturn.down.circle.fill",
             value: "0",
-            label: "Списания",
+            label: L10n.tr("products.writeoffs"),
             backgroundColor: UIColor { traits in
                 traits.userInterfaceStyle == .dark
                     ? UIColor.systemRed.withAlphaComponent(0.22)
@@ -115,7 +115,7 @@ final class ProductsView: UIView {
     }
     
     private func setupSearchBar() {
-        searchBar.placeholder = "Поиск по названию, категории или штрихкоду…"
+        searchBar.placeholder = L10n.tr("products.search_full")
         searchBar.searchBarStyle = .minimal
         
         // Исправление фона SearchBar согласно скриншоту
@@ -125,7 +125,7 @@ final class ProductsView: UIView {
         searchBar.searchTextField.backgroundColor = searchFill
         searchBar.searchTextField.textColor = .label
         searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
-            string: "Поиск по названию, категории или штрихкоду…",
+            string: L10n.tr("products.search_full"),
             attributes: [.foregroundColor: UIColor.secondaryLabel]
         )
         searchBar.layer.cornerRadius = 12

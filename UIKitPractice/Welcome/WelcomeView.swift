@@ -24,17 +24,17 @@ final class WelcomeView: UIView {
         backgroundColor = .systemBackground
         
         
-        titleLabel.text = "Система учета товаров"
+        titleLabel.text = L10n.tr("auth.app_subtitle_alt")
         titleLabel.font = .systemFont(ofSize: 28, weight: .semibold)
         titleLabel.textAlignment = .center
         
-        subtitleLabel.text = "Войти или зарегистрироваться"
+        subtitleLabel.text = L10n.tr("welcome.subtitle")
         subtitleLabel.font = .systemFont(ofSize: 15)
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         
         var loginConfig = UIButton.Configuration.bordered()
-        loginConfig.title = "Войти"
+        loginConfig.title = L10n.tr("Войти")
         loginConfig.baseForegroundColor = .systemBlue
         loginConfig.cornerStyle = .medium
         loginConfig.contentInsets = NSDirectionalEdgeInsets(top:14, leading: 24, bottom: 14, trailing: 24)

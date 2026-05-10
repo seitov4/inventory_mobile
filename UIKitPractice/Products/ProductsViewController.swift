@@ -14,7 +14,7 @@ final class ProductsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Товары"
+        navigationItem.title = L10n.tr("Товары")
         navigationItem.largeTitleDisplayMode = .never
         view.backgroundColor = .systemGroupedBackground
 

@@ -78,23 +78,23 @@ final class AuthManager {
         var error: NSError?
         let ok = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
         guard ok else {
-            return .unavailable(reason: error?.localizedDescription ?? "Биометрия недоступна на этом устройстве.")
+            return .unavailable(reason: error?.localizedDescription ?? L10n.tr("auth.biometry_unavailable"))
         }
         return .available(kind: context.biometryType)
     }
 
     func authenticateWithBiometrics(reason: String) async -> Result<Void, Error> {
         let context = LAContext()
-        context.localizedCancelTitle = "Отмена"
+        context.localizedCancelTitle = L10n.tr("common.cancel")
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            return .failure(error ?? NSError(domain: "AuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Биометрия недоступна."]))
+            return .failure(error ?? NSError(domain: "AuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: L10n.tr("auth.biometry_generic_unavailable")]))
         }
 
         do {
             let ok = try await context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason)
-            return ok ? .success(()) : .failure(NSError(domain: "AuthManager", code: -2, userInfo: [NSLocalizedDescriptionKey: "Не удалось выполнить биометрическую аутентификацию."]))
+            return ok ? .success(()) : .failure(NSError(domain: "AuthManager", code: -2, userInfo: [NSLocalizedDescriptionKey: L10n.tr("auth.biometry_failed")]))
         } catch {
             return .failure(error)
         }

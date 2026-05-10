@@ -9,6 +9,8 @@ import Foundation
 
 final class SettingsViewModel {
     private let notificationsKey = "profile_notifications"
+    private let localizationManager = LocalizationManager.shared
+
     var currentNotifications: Bool {
         get { UserDefaults.standard.bool(forKey: notificationsKey) }
         set { UserDefaults.standard.set(newValue, forKey: notificationsKey) }
@@ -25,5 +27,10 @@ final class SettingsViewModel {
 
     func toggleNotifications(_ isOn: Bool) {
         currentNotifications = isOn
+    }
+
+    var currentLanguage: AppLanguage {
+        get { localizationManager.currentLanguage }
+        set { localizationManager.currentLanguage = newValue }
     }
 }

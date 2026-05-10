@@ -12,6 +12,14 @@ enum AnalyticsPeriodKind: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var title: String {
+        switch self {
+        case .week: return L10n.tr("analytics.period.week")
+        case .month: return L10n.tr("analytics.period.month")
+        case .quarter: return L10n.tr("analytics.period.quarter")
+        }
+    }
+
     var dayCount: Int {
         switch self {
         case .week: return 7

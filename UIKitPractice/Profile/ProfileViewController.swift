@@ -70,13 +70,13 @@ final class ProfileViewController: UIViewController {
     // MARK: - Logout Alert
     private func showLogoutAlert() {
         let alert = UIAlertController(
-            title: "Выйти из аккаунта?",
-            message: "Вы точно хотите выйти?",
+            title: L10n.tr("profile.logout_title"),
+            message: L10n.tr("profile.logout_message"),
             preferredStyle: .alert
         )
 
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Выйти", style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: L10n.tr("common.cancel"), style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.tr("common.logout"), style: .destructive) { [weak self] _ in
             self?.onLogout?()
         })
 

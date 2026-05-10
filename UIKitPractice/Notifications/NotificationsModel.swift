@@ -11,6 +11,14 @@ enum NotificationTimeBucket: String, CaseIterable, Identifiable {
     case week = "На этой неделе"
 
     var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .today: return L10n.tr("notifications.today")
+        case .yesterday: return L10n.tr("notifications.yesterday")
+        case .week: return L10n.tr("notifications.week")
+        }
+    }
 }
 
 struct StoreNotificationItem: Identifiable {

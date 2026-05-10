@@ -64,16 +64,17 @@ struct QuickSaleScreen: View {
                 }
             )
         }
+        .appLocalized()
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Продажа")
+            Text(L10n.tr("Продажа"))
                 .font(.system(size: 30, weight: .bold))
                 .tracking(-0.3)
                 .foregroundStyle(SalesColors.foreground)
 
-            Text("Сканируйте товары — они появятся в чеке")
+            Text(L10n.tr("Сканируйте товары — они появятся в чеке"))
                 .font(.system(size: 14))
                 .foregroundStyle(SalesColors.mutedForeground)
         }
@@ -102,13 +103,13 @@ struct QuickSaleScreen: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Сканировать штрих-код")
+                        Text(L10n.tr("Сканировать штрих-код"))
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
 
-                        Text("Нажмите для камеры")
+                        Text(L10n.tr("Нажмите для камеры"))
                             .font(.system(size: 12))
                             .foregroundStyle(.white.opacity(0.85))
                             .lineLimit(1)
@@ -157,13 +158,13 @@ struct QuickSaleScreen: View {
                         .background(SalesColors.accent, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Сканировать товар по сканеру")
+                        Text(L10n.tr("Сканировать товар по сканеру"))
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(SalesColors.foreground)
                             .lineLimit(1)
                             .minimumScaleFactor(0.85)
 
-                        Text(isHardwareScannerReady ? "Подключите сканер и считайте штрих-код" : "Нажмите, чтобы активировать ввод")
+                        Text(L10n.tr(isHardwareScannerReady ? "Подключите сканер и считайте штрих-код" : "Нажмите, чтобы активировать ввод"))
                             .font(.system(size: 12))
                             .foregroundStyle(SalesColors.mutedForeground)
                             .lineLimit(1)
@@ -192,7 +193,7 @@ struct QuickSaleScreen: View {
     private var mockScannerTools: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Тест сканирования")
+                Text(L10n.tr("Тест сканирования"))
                     .font(.system(size: 12, weight: .semibold))
                     .tracking(0.8)
                     .foregroundStyle(SalesColors.mutedForeground)
@@ -202,7 +203,7 @@ struct QuickSaleScreen: View {
                 Button {
                     viewModel.fillMockReceipt()
                 } label: {
-                    Label("Заполнить чек", systemImage: "wand.and.stars")
+                    Label(L10n.tr("Заполнить чек"), systemImage: "wand.and.stars")
                         .font(.system(size: 12, weight: .semibold))
                 }
                 .foregroundStyle(SalesColors.primary)
@@ -238,7 +239,7 @@ struct QuickSaleScreen: View {
 
     private var receiptHeader: some View {
         HStack {
-            Text("ЧЕК")
+            Text(L10n.tr("ЧЕК"))
                 .font(.system(size: 12, weight: .semibold))
                 .tracking(1.4)
                 .foregroundStyle(SalesColors.mutedForeground)
@@ -246,7 +247,7 @@ struct QuickSaleScreen: View {
             Spacer()
 
             if viewModel.hasItems {
-                Button("Очистить") {
+                Button(L10n.tr("Очистить")) {
                     viewModel.clearCart()
                 }
                 .font(.system(size: 14, weight: .semibold))
@@ -268,11 +269,11 @@ struct QuickSaleScreen: View {
                 }
 
             VStack(spacing: 6) {
-                Text("Чек пуст")
+                Text(L10n.tr("Чек пуст"))
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(SalesColors.foreground)
 
-                Text("Отсканируйте первый товар, чтобы начать продажу")
+                Text(L10n.tr("Отсканируйте первый товар, чтобы начать продажу"))
                     .font(.system(size: 14))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(SalesColors.mutedForeground)
@@ -307,7 +308,7 @@ struct QuickSaleScreen: View {
     private var stickyFooter: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Позиций")
+                Text(L10n.tr("Позиций"))
                     .font(.system(size: 12))
                     .foregroundStyle(SalesColors.mutedForeground)
 
@@ -317,7 +318,7 @@ struct QuickSaleScreen: View {
                         .monospacedDigit()
                         .foregroundStyle(SalesColors.foreground)
 
-                    Text("· \(viewModel.totalQuantity) шт.")
+                    Text(L10n.format("sales.total_quantity_format", viewModel.totalQuantity))
                         .font(.system(size: 14, weight: .semibold))
                         .monospacedDigit()
                         .foregroundStyle(SalesColors.mutedForeground)
@@ -328,7 +329,7 @@ struct QuickSaleScreen: View {
             Button {
                 viewModel.completeSale()
             } label: {
-                Label("Завершить продажу", systemImage: "checkmark")
+                Label(L10n.tr("Завершить продажу"), systemImage: "checkmark")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -393,7 +394,7 @@ private struct CartItemCard: View {
                     .truncationMode(.tail)
                     .foregroundStyle(SalesColors.foreground)
 
-                Text("Остаток: \(item.remainingStock)")
+                Text(L10n.format("sales.stock_left_format", item.remainingStock))
                     .font(.system(size: 12))
                     .monospacedDigit()
                     .foregroundStyle(SalesColors.mutedForeground)
@@ -487,7 +488,7 @@ private struct CameraScannerOverlay: View {
                 BarcodeDataScannerView(onBarcode: onBarcode)
                     .ignoresSafeArea()
             } else {
-                Text("Сканер недоступен на этом устройстве")
+                Text(L10n.tr("Сканер недоступен на этом устройстве"))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
             }
@@ -513,7 +514,7 @@ private struct CameraScannerOverlay: View {
 
                 Spacer()
 
-                Text("Наведите камеру на штрих-код товара")
+                Text(L10n.tr("Наведите камеру на штрих-код товара"))
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white)
                     .padding(.bottom, 50)

@@ -33,7 +33,11 @@ final class ProfileSegmentCell: UITableViewCell {
     }()
 
     let segment: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["Светлая", "Тёмная", "Системная"])
+        let sc = UISegmentedControl(items: [
+            L10n.tr("settings.theme.light"),
+            L10n.tr("settings.theme.dark"),
+            L10n.tr("settings.theme.system")
+        ])
         sc.translatesAutoresizingMaskIntoConstraints = false
 
         // Сегмент должен расширяться максимально

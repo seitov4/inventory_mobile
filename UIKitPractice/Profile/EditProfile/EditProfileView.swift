@@ -36,12 +36,12 @@ final class EditProfileView: UIView {
         scrollView.addSubview(contentView)
         
         // === Поля ввода ===
-        nameField.configureModernField(placeholder: "Ваше имя", icon: "person")
+        nameField.configureModernField(placeholder: L10n.tr("personal.your_name"), icon: "person")
         emailField.configureModernField(placeholder: "Email", icon: "envelope", keyboardType: .emailAddress)
         
         // === Кнопка Сохранить ===
         var config = UIButton.Configuration.filled()
-        config.title = "Сохранить изменения"
+        config.title = L10n.tr("edit_profile.save_changes")
         config.baseBackgroundColor = .systemBlue
         config.baseForegroundColor = .white
         config.cornerStyle = .large

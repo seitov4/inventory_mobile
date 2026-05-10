@@ -45,7 +45,10 @@ final class LoginViewController: UIViewController {
             viewModel.onLoginFailure = { [weak self] message in
                 guard let self else { return }
 
-                let field = message.contains("пароль")
+                let lowercasedMessage = message.lowercased()
+                let field = lowercasedMessage.contains("парол")
+                    || lowercasedMessage.contains("password")
+                    || lowercasedMessage.contains("құпия")
                     ? self.rootView.passwordField
                     : self.rootView.loginField
 

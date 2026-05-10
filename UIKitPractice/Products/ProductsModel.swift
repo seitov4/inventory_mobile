@@ -61,7 +61,7 @@ struct Category {
     let name: String
     let displayName: String
     
-    static let all = Category(name: "all", displayName: "Все")
+    static var all: Category { Category(name: "all", displayName: L10n.tr("Все")) }
     
     var isAll: Bool {
         return name == "all"

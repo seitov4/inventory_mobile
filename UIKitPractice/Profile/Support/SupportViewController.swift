@@ -17,7 +17,7 @@ final class SupportViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Поддержка"
+        title = L10n.tr("support.title")
         navigationController?.navigationBar.prefersLargeTitles = true
     }
 }

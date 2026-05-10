@@ -27,7 +27,7 @@ struct NotificationsScreen: View {
                                 }
                         }
                     } header: {
-                        Text(bucket.rawValue)
+                        Text(bucket.title)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .textCase(nil)
@@ -38,6 +38,7 @@ struct NotificationsScreen: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Color(.systemGroupedBackground))
+        .appLocalized()
     }
 
     private func notificationRow(_ item: StoreNotificationItem) -> some View {

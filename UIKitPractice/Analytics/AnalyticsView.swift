@@ -22,9 +22,9 @@ struct AnalyticsScreen: View {
                     .opacity(isBannerVisible ? 1 : 0)
                     .offset(y: isBannerVisible ? 0 : 8)
 
-                Picker("Период", selection: $viewModel.period) {
+                Picker(L10n.tr("analytics.period"), selection: $viewModel.period) {
                     ForEach(AnalyticsPeriodKind.allCases) { p in
-                        Text(p.rawValue).tag(p)
+                        Text(p.title).tag(p)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -40,6 +40,7 @@ struct AnalyticsScreen: View {
             .padding(.bottom, 24)
         }
         .background(Color(.systemGroupedBackground))
+        .appLocalized()
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) {
                 isBannerVisible = true
@@ -50,10 +51,10 @@ struct AnalyticsScreen: View {
     private var analyticsHeader: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Главная")
+                Text(L10n.tr("Главная"))
                     .font(.headline)
                     .foregroundStyle(.secondary)
-                Text("Аналитика")
+                Text(L10n.tr("Аналитика"))
                     .font(.largeTitle.bold())
                     .foregroundStyle(.primary)
             }
@@ -64,7 +65,7 @@ struct AnalyticsScreen: View {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 12, weight: .semibold))
-                    Text("AI чат")
+                    Text(L10n.tr("AI чат"))
                         .font(.subheadline.weight(.semibold))
                 }
                 .foregroundStyle(.white)
@@ -122,11 +123,11 @@ struct AnalyticsScreen: View {
                             .fill(.white.opacity(0.14))
                     )
 
-                    Text("Повысьте продажи с AI-\nпомощником")
+                    Text(L10n.tr("analytics.ai_promo_title"))
                         .font(.title3.bold())
                         .foregroundStyle(.white)
 
-                    Text("Анализ конкурентов, прогноз спроса и идеи роста за секунды")
+                    Text(L10n.tr("analytics.ai_promo_subtitle"))
                         .font(.footnote)
                         .foregroundStyle(.white.opacity(0.9))
                         .lineLimit(2)
@@ -190,16 +191,16 @@ struct AnalyticsScreen: View {
 
     private var chartCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Динамика продаж")
+            Text(L10n.tr("Динамика продаж"))
                 .font(.headline)
-            Text("Сумма по дням (мок-данные)")
+            Text(L10n.tr("analytics.chart.subtitle"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
             Chart(viewModel.dailySales) { row in
                 BarMark(
-                    x: .value("День", row.weekday),
-                    y: .value("Сумма", row.amount)
+                    x: .value(L10n.tr("analytics.chart.day"), row.weekday),
+                    y: .value(L10n.tr("analytics.chart.amount"), row.amount)
                 )
                 .foregroundStyle(
                     LinearGradient(
@@ -241,9 +242,9 @@ struct AnalyticsScreen: View {
 
     private var categoriesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Категории")
+            Text(L10n.tr("Категории"))
                 .font(.headline)
-            Text("Доля выручки")
+            Text(L10n.tr("analytics.categories.subtitle"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 

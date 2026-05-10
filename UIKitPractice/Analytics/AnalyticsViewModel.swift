@@ -16,9 +16,23 @@ final class AnalyticsViewModel {
     private(set) var metrics: [AnalyticsMetric] = []
     private(set) var dailySales: [AnalyticsDaySale] = []
     private(set) var categories: [AnalyticsCategoryRow] = []
+    private var languageObserver: NSObjectProtocol?
 
     init() {
         refresh()
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refresh()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     func refresh() {
@@ -43,30 +57,30 @@ final class AnalyticsViewModel {
 
         return [
             AnalyticsMetric(
-                title: "Выручка",
+                title: L10n.tr("analytics.metric.revenue"),
                 value: cf.string(from: NSNumber(value: revenue)) ?? "—",
-                subtitle: "за период",
+                subtitle: L10n.tr("analytics.subtitle.period"),
                 systemImage: "tengesign.circle.fill",
                 tintHex: 0x1C7AF5
             ),
             AnalyticsMetric(
-                title: "Заказы",
+                title: L10n.tr("analytics.metric.orders"),
                 value: nf.string(from: NSNumber(value: orders)) ?? "—",
-                subtitle: "шт.",
+                subtitle: L10n.tr("analytics.subtitle.pieces"),
                 systemImage: "bag.fill",
                 tintHex: 0x6FCF97
             ),
             AnalyticsMetric(
-                title: "Средний чек",
+                title: L10n.tr("analytics.metric.avg_check"),
                 value: cf.string(from: NSNumber(value: avgCheck)) ?? "—",
-                subtitle: "на заказ",
+                subtitle: L10n.tr("analytics.subtitle.per_order"),
                 systemImage: "chart.bar.doc.horizontal.fill",
                 tintHex: 0xF2994A
             ),
             AnalyticsMetric(
-                title: "Конверсия",
+                title: L10n.tr("analytics.metric.conversion"),
                 value: String(format: "%.1f%%", conv),
-                subtitle: "визит → покупка",
+                subtitle: L10n.tr("analytics.subtitle.visit_purchase"),
                 systemImage: "arrow.triangle.branch",
                 tintHex: 0x9B51E0
             )
@@ -78,13 +92,21 @@ final class AnalyticsViewModel {
         let count: Int
         switch period {
         case .week:
-            labels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+            labels = [
+                L10n.tr("analytics.week.mon"),
+                L10n.tr("analytics.week.tue"),
+                L10n.tr("analytics.week.wed"),
+                L10n.tr("analytics.week.thu"),
+                L10n.tr("analytics.week.fri"),
+                L10n.tr("analytics.week.sat"),
+                L10n.tr("analytics.week.sun")
+            ]
             count = 7
         case .month:
             labels = (1...10).map { "\($0)" }
             count = 10
         case .quarter:
-            labels = ["1н", "2н", "3н", "4н", "5н", "6н", "7н", "8н", "9н", "10н", "11н", "12н", "13н"]
+            labels = (1...13).map { L10n.format("analytics.week_number_format", $0) }
             count = 13
         }
 
@@ -105,11 +127,11 @@ final class AnalyticsViewModel {
 
         let base = Double(period.dayCount) * 1_200
         let rows = [
-            ("Напитки", 0.34, base * 1.1),
-            ("Снеки", 0.26, base * 0.85),
-            ("Бакалея", 0.22, base * 0.7),
-            ("Заморозка", 0.12, base * 0.45),
-            ("Прочее", 0.06, base * 0.25)
+            (L10n.tr("analytics.category.drinks"), 0.34, base * 1.1),
+            (L10n.tr("analytics.category.snacks"), 0.26, base * 0.85),
+            (L10n.tr("analytics.category.grocery"), 0.22, base * 0.7),
+            (L10n.tr("analytics.category.frozen"), 0.12, base * 0.45),
+            (L10n.tr("analytics.category.other"), 0.06, base * 0.25)
         ]
         return rows.map { name, share, rev in
             AnalyticsCategoryRow(

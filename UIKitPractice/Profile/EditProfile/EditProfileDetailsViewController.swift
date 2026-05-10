@@ -38,7 +38,7 @@ final class EditProfileDetailsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Личные данные"
+        title = L10n.tr("Личные данные")
         view.backgroundColor = .systemBackground
         setupUI()
         populateData()
@@ -76,11 +76,11 @@ final class EditProfileDetailsViewController: UIViewController {
 
     private func populateData() {
         let fields = [
-            ("Имя", userData.name),
-            ("Фамилия", userData.surname),
-            ("Возраст", userData.age),
-            ("Должность", userData.position),
-            ("Магазин", userData.store),
+            (L10n.tr("personal.name"), userData.name),
+            (L10n.tr("personal.surname"), userData.surname),
+            (L10n.tr("personal.age"), userData.age),
+            (L10n.tr("Должность"), userData.position),
+            (L10n.tr("personal.store"), userData.store),
             ("Email", userData.email)
         ]
 

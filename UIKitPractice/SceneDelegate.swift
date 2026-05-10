@@ -13,10 +13,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var appCoordinator: AppCoordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        ThemeManager.shared.applySavedTheme()
-
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
+        ThemeManager.shared.applySavedTheme(to: window)
         self.window = window
 
         if let shortcutItem = connectionOptions.shortcutItem,
@@ -48,6 +47,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         completionHandler(true)
     }
 }
-
 
 

@@ -10,9 +10,23 @@ import Observation
 final class NotificationsViewModel {
 
     var items: [StoreNotificationItem]
+    private var languageObserver: NSObjectProtocol?
 
     init() {
         items = Self.makeMock()
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.reloadLocalizedItems()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     func markAllRead() {
@@ -34,12 +48,21 @@ final class NotificationsViewModel {
         items.filter { $0.bucket == bucket }
     }
 
+    private func reloadLocalizedItems() {
+        let unreadByID = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0.isUnread) })
+        items = Self.makeMock().map { item in
+            var copy = item
+            copy.isUnread = unreadByID[item.id] ?? item.isUnread
+            return copy
+        }
+    }
+
     private static func makeMock() -> [StoreNotificationItem] {
         [
             StoreNotificationItem(
                 id: "1",
-                title: "Заканчивается срок годности",
-                message: "12 позиций в категории «Молочные продукты» требуют внимания.",
+                title: L10n.tr("notifications.expiry_title"),
+                message: L10n.tr("notifications.expiry_message"),
                 timeLabel: "09:42",
                 systemImage: "calendar.badge.exclamationmark",
                 tintHex: 0xF2994A,
@@ -48,8 +71,8 @@ final class NotificationsViewModel {
             ),
             StoreNotificationItem(
                 id: "2",
-                title: "Поставка принята",
-                message: "Накладная № 18492 успешно проведена на склад «Основной».",
+                title: L10n.tr("notifications.delivery_title"),
+                message: L10n.tr("notifications.delivery_message"),
                 timeLabel: "08:15",
                 systemImage: "shippingbox.fill",
                 tintHex: 0x1C7AF5,
@@ -58,9 +81,9 @@ final class NotificationsViewModel {
             ),
             StoreNotificationItem(
                 id: "3",
-                title: "Низкий остаток",
-                message: "SKU «Вода 0,5 л» — осталось 8 шт., порог 24 шт.",
-                timeLabel: "Вчера",
+                title: L10n.tr("notifications.low_stock_title"),
+                message: L10n.tr("notifications.low_stock_message"),
+                timeLabel: L10n.tr("notifications.yesterday"),
                 systemImage: "cube.transparent.fill",
                 tintHex: 0xEB5757,
                 isUnread: false,
@@ -68,9 +91,9 @@ final class NotificationsViewModel {
             ),
             StoreNotificationItem(
                 id: "4",
-                title: "Отчёт готов",
-                message: "Еженедельная аналитика по сменам доступна в разделе «Аналитика».",
-                timeLabel: "Вчера",
+                title: L10n.tr("notifications.report_title"),
+                message: L10n.tr("notifications.report_message"),
+                timeLabel: L10n.tr("notifications.yesterday"),
                 systemImage: "doc.text.fill",
                 tintHex: 0x6FCF97,
                 isUnread: false,
@@ -78,9 +101,9 @@ final class NotificationsViewModel {
             ),
             StoreNotificationItem(
                 id: "5",
-                title: "Обновление приложения",
-                message: "Доступна версия 2.4 — улучшения кассы и офлайн-режима.",
-                timeLabel: "Пн",
+                title: L10n.tr("notifications.update_title"),
+                message: L10n.tr("notifications.update_message"),
+                timeLabel: L10n.tr("notifications.monday"),
                 systemImage: "arrow.down.circle.fill",
                 tintHex: 0x9B51E0,
                 isUnread: false,
@@ -88,9 +111,9 @@ final class NotificationsViewModel {
             ),
             StoreNotificationItem(
                 id: "6",
-                title: "Смена закрыта",
-                message: "Кассир А. Иванова закрыла смену № 412 с расхождением \(AppCurrency.string(from: 0)).",
-                timeLabel: "Пн",
+                title: L10n.tr("notifications.shift_closed_title"),
+                message: L10n.format("notifications.shift_closed_message_format", AppCurrency.string(from: 0)),
+                timeLabel: L10n.tr("notifications.monday"),
                 systemImage: "checkmark.seal.fill",
                 tintHex: 0x27AE60,
                 isUnread: false,

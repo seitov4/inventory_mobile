@@ -20,6 +20,7 @@ final class QuickSaleViewModel {
     private let debounceInterval: TimeInterval = 1.5
     private let successScanSoundID: SystemSoundID = 1057
     private let failedScanSoundID: SystemSoundID = 1053
+    private var languageObserver: NSObjectProtocol?
 
     var hasItems: Bool {
         !cartItems.isEmpty
@@ -41,6 +42,19 @@ final class QuickSaleViewModel {
         self.productsService = productsService
         seedLocalCatalog()
         refreshCatalog()
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.reloadLocalizedCatalog()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     func processBarcode(_ rawBarcode: String) {
@@ -52,8 +66,8 @@ final class QuickSaleViewModel {
         }
 
         guard let product = productsByBarcode[barcode] else {
-            playSuccessScanSound()
-            showToast("Товар не найден: \(barcode)", style: .destructive)
+            playFailedScanSound()
+            showToast(L10n.format("sales.product_not_found_format", barcode), style: .destructive)
             return
         }
 
@@ -72,11 +86,11 @@ final class QuickSaleViewModel {
                 add(product, bypassDebounce: true, source: .mock)
             }
         }
-        showToast("Моковый чек готов", style: .success)
+        showToast(L10n.tr("sales.mock_receipt_ready"), style: .success)
     }
 
     func hardwareScannerActivated() {
-        showToast("Проводной сканер готов", style: .success)
+        showToast(L10n.tr("sales.hardware_ready"), style: .success)
     }
 
     func increment(_ item: SalesCartItem) {
@@ -104,20 +118,20 @@ final class QuickSaleViewModel {
         guard hasItems else { return }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         clearCart()
-        showToast("Продажа завершена", style: .success)
+        showToast(L10n.tr("sales.completed"), style: .success)
     }
 
     private func add(_ product: Product, bypassDebounce: Bool = false, source: AddSource = .manual) {
         if product.quantity <= 0 {
-            if source.playsScanSound { playSuccessScanSound() }
-            showToast("Нет в наличии", style: .warning)
+            if source.playsScanSound { playFailedScanSound() }
+            showToast(L10n.tr("sales.out_of_stock"), style: .warning)
             return
         }
 
         if let index = cartItems.firstIndex(where: { $0.product.id == product.id }) {
             guard cartItems[index].quantity < product.quantity else {
-                if source.playsScanSound { playSuccessScanSound() }
-                showToast("Достигнут остаток", style: .warning)
+                if source.playsScanSound { playFailedScanSound() }
+                showToast(L10n.tr("sales.stock_limit"), style: .warning)
                 return
             }
             cartItems[index].quantity += 1
@@ -187,12 +201,12 @@ final class QuickSaleViewModel {
 
     private func seedLocalCatalog() {
         let products = [
-            Product(id: 1, name: "Молоко 3.2%", barcode: "4600123456789", price: 89, quantity: 45, category: "Молочные", lowStockThreshold: 10),
-            Product(id: 2, name: "Сыр Российский", barcode: "4600123456790", price: 459, quantity: 8, category: "Молочные", lowStockThreshold: 10),
-            Product(id: 3, name: "Хлеб белый", barcode: "4600123456791", price: 45, quantity: 12, category: "Хлеб", lowStockThreshold: 15),
-            Product(id: 4, name: "Колбаса Докторская", barcode: "4600123456792", price: 389, quantity: 5, category: "Мясные", lowStockThreshold: 10),
-            Product(id: 5, name: "Вода минеральная", barcode: "4600123456793", price: 35, quantity: 120, category: "Напитки", lowStockThreshold: 20),
-            Product(id: 6, name: "Кофе растворимый", barcode: "4600123456794", price: 299, quantity: 3, category: "Напитки", lowStockThreshold: 10)
+            Product(id: 1, name: L10n.tr("product.mock.milk"), barcode: "4600123456789", price: 89, quantity: 45, category: L10n.tr("product.category.dairy"), lowStockThreshold: 10),
+            Product(id: 2, name: L10n.tr("product.mock.cheese"), barcode: "4600123456790", price: 459, quantity: 8, category: L10n.tr("product.category.dairy"), lowStockThreshold: 10),
+            Product(id: 3, name: L10n.tr("product.mock.bread"), barcode: "4600123456791", price: 45, quantity: 12, category: L10n.tr("product.category.bread"), lowStockThreshold: 15),
+            Product(id: 4, name: L10n.tr("product.mock.sausage"), barcode: "4600123456792", price: 389, quantity: 5, category: L10n.tr("product.category.meat"), lowStockThreshold: 10),
+            Product(id: 5, name: L10n.tr("product.mock.water"), barcode: "4600123456793", price: 35, quantity: 120, category: L10n.tr("product.category.drinks"), lowStockThreshold: 20),
+            Product(id: 6, name: L10n.tr("product.mock.coffee"), barcode: "4600123456794", price: 299, quantity: 3, category: L10n.tr("product.category.drinks"), lowStockThreshold: 10)
         ]
 
         productsByBarcode = Dictionary(
@@ -201,6 +215,19 @@ final class QuickSaleViewModel {
                 return (barcode, product)
             }
         )
+    }
+
+    private func reloadLocalizedCatalog() {
+        let quantitiesByID = Dictionary(uniqueKeysWithValues: cartItems.map { ($0.product.id, $0.quantity) })
+        seedLocalCatalog()
+        refreshCatalog()
+        cartItems = cartItems.compactMap { item in
+            guard let barcode = item.product.barcode,
+                  let localizedProduct = productsByBarcode[barcode] else {
+                return item
+            }
+            return SalesCartItem(product: localizedProduct, quantity: quantitiesByID[item.product.id] ?? item.quantity)
+        }
     }
 
     private func showToast(_ message: String, style: SalesToast.Style) {

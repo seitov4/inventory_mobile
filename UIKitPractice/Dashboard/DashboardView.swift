@@ -25,16 +25,16 @@ final class DashboardView: UIView {
     private func setup() {
         backgroundColor = .systemBackground
         
-        titleLabel.text = "Дашборд"
+        titleLabel.text = L10n.tr("dashboard.title")
         titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
         titleLabel.textAlignment = .center
         
-        subtitleLabel.text = "Краткая статистика по магазину"
+        subtitleLabel.text = L10n.tr("dashboard.subtitle")
         subtitleLabel.font = .systemFont(ofSize: 14)
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         
-        summaryLabel.text = "Продаж за сегодня: -"
+        summaryLabel.text = L10n.tr("dashboard.sales_today_empty")
         summaryLabel.font = .systemFont(ofSize: 16, weight: .medium)
         summaryLabel.textAlignment = .left
         
@@ -64,5 +64,4 @@ final class DashboardView: UIView {
         ])
     }
 }
-
 

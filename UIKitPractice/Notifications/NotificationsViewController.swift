@@ -23,14 +23,9 @@ final class NotificationsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-        navigationItem.title = "Уведомления"
+        updateLocalizedText()
         navigationItem.largeTitleDisplayMode = .always
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Все прочитаны",
-            style: .done,
-            target: self,
-            action: #selector(markAllReadTapped)
-        )
+        NotificationCenter.default.addObserver(self, selector: #selector(languageDidChange), name: .appLanguageDidChange, object: nil)
 
         let root = NotificationsScreen(viewModel: viewModel)
         let host = UIHostingController(rootView: root)
@@ -51,5 +46,19 @@ final class NotificationsViewController: UIViewController {
 
     @objc private func markAllReadTapped() {
         viewModel.markAllRead()
+    }
+
+    @objc private func languageDidChange() {
+        updateLocalizedText()
+    }
+
+    private func updateLocalizedText() {
+        navigationItem.title = L10n.tr("tab.notifications")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: L10n.tr("notifications.mark_all_read"),
+            style: .done,
+            target: self,
+            action: #selector(markAllReadTapped)
+        )
     }
 }

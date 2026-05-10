@@ -17,12 +17,12 @@ final class LoginViewModel {
     func login(login: String?, password: String?, type: LoginType) {
 
         guard let login, !login.isEmpty else {
-            onLoginFailure?(type == .email ? "Введите email" : "Введите номер телефона")
+            onLoginFailure?(type == .email ? L10n.tr("Введите email") : L10n.tr("Введите номер телефона"))
             return
         }
 
         guard let password, !password.isEmpty else {
-            onLoginFailure?("Введите пароль")
+            onLoginFailure?(L10n.tr("Введите пароль"))
             return
         }
 
@@ -49,4 +49,3 @@ final class LoginViewModel {
         return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: email)
     }
 }
-

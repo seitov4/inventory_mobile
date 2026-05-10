@@ -21,10 +21,24 @@ struct Employee: Identifiable {
 final class MyEnterpriseViewModel: ObservableObject {
     @Published var enterprise: EnterpriseInfo
     @Published var employees: [Employee]
+    private var languageObserver: NSObjectProtocol?
 
     init(enterprise: EnterpriseInfo, employees: [Employee]) {
         self.enterprise = enterprise
         self.employees = employees
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.localizeMockEmployeeRoles()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     static func mock() -> MyEnterpriseViewModel {
@@ -37,12 +51,27 @@ final class MyEnterpriseViewModel: ObservableObject {
                 taxId: "BIN 123456789012"
             ),
             employees: [
-                .init(id: 1, fullName: "Aruzhan Sarsembayeva", role: "Owner", phone: "+7 701 000 11 22", isActive: true),
-                .init(id: 2, fullName: "Dias Nurpeissov", role: "Cashier", phone: "+7 702 111 22 33", isActive: true),
-                .init(id: 3, fullName: "Madina Orazova", role: "Cashier", phone: "+7 705 444 55 66", isActive: false),
-                .init(id: 4, fullName: "Timur Abdrakhmanov", role: "Admin", phone: "+7 707 987 65 43", isActive: true)
+                .init(id: 1, fullName: "Aruzhan Sarsembayeva", role: L10n.tr("enterprise.employee.owner"), phone: "+7 701 000 11 22", isActive: true),
+                .init(id: 2, fullName: "Dias Nurpeissov", role: L10n.tr("enterprise.employee.cashier"), phone: "+7 702 111 22 33", isActive: true),
+                .init(id: 3, fullName: "Madina Orazova", role: L10n.tr("enterprise.employee.cashier"), phone: "+7 705 444 55 66", isActive: false),
+                .init(id: 4, fullName: "Timur Abdrakhmanov", role: L10n.tr("enterprise.employee.admin"), phone: "+7 707 987 65 43", isActive: true)
             ]
         )
+    }
+
+    private func localizeMockEmployeeRoles() {
+        employees = employees.map { employee in
+            let role: String
+            switch employee.id {
+            case 1:
+                role = L10n.tr("enterprise.employee.owner")
+            case 2, 3:
+                role = L10n.tr("enterprise.employee.cashier")
+            default:
+                role = L10n.tr("enterprise.employee.admin")
+            }
+            return Employee(id: employee.id, fullName: employee.fullName, role: role, phone: employee.phone, isActive: employee.isActive)
+        }
     }
 }
 
@@ -51,20 +80,20 @@ struct MyEnterpriseScreen: View {
 
     var body: some View {
         Form {
-            Section("Общие данные") {
-                InfoRow(title: "Название", value: viewModel.enterprise.name)
-                InfoRow(title: "Адрес", value: viewModel.enterprise.address)
-                InfoRow(title: "Телефон", value: viewModel.enterprise.phone)
+            Section(L10n.tr("enterprise.general")) {
+                InfoRow(title: L10n.tr("enterprise.name"), value: viewModel.enterprise.name)
+                InfoRow(title: L10n.tr("enterprise.address"), value: viewModel.enterprise.address)
+                InfoRow(title: L10n.tr("Телефон"), value: viewModel.enterprise.phone)
                 InfoRow(title: "Email", value: viewModel.enterprise.email)
-                InfoRow(title: "ИИН/БИН", value: viewModel.enterprise.taxId)
+                InfoRow(title: L10n.tr("enterprise.tax_id"), value: viewModel.enterprise.taxId)
             }
 
-            Section("Команда") {
+            Section(L10n.tr("enterprise.team")) {
                 NavigationLink {
                     EmployeesScreen(employees: viewModel.employees)
                 } label: {
                     HStack {
-                        Label("Сотрудники", systemImage: "person.3.fill")
+                        Label(L10n.tr("Сотрудники"), systemImage: "person.3.fill")
                         Spacer()
                         Text("\(viewModel.employees.count)")
                             .foregroundStyle(.secondary)
@@ -72,7 +101,8 @@ struct MyEnterpriseScreen: View {
                 }
             }
         }
-        .navigationTitle("Моё предприятие")
+        .navigationTitle(L10n.tr("Моё предприятие"))
+        .appLocalized()
     }
 }
 
@@ -105,7 +135,8 @@ struct EmployeesScreen: View {
             }
             .padding(.vertical, 4)
         }
-        .navigationTitle("Сотрудники")
+        .navigationTitle(L10n.tr("Сотрудники"))
+        .appLocalized()
     }
 }
 

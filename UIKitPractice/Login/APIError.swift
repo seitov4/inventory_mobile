@@ -18,18 +18,17 @@ enum APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unauthorized:
-            return "Неверный логин или пароль"
+            return L10n.tr("auth.invalid_credentials")
         case .notFound:
-            return "Пользователь не найден"
+            return L10n.tr("auth.user_not_found")
         case .server:
-            return "Сервер временно недоступен"
+            return L10n.tr("auth.server_unavailable")
         case .decoding:
-            return "Ошибка обработки данных"
+            return L10n.tr("auth.decoding_error")
         case .noData:
-            return "Нет данных от сервера"
+            return L10n.tr("auth.no_data")
         case .unknown:
-            return "Произошла ошибка. Попробуйте позже"
+            return L10n.tr("auth.generic_error")
         }
     }
 }
-

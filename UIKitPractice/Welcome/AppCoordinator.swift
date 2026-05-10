@@ -82,7 +82,7 @@ final class AppCoordinator: Coordinator {
             self?.startMainFlow()
         }
         let vc = UIHostingController(rootView: view)
-        vc.title = "Код-пароль"
+        vc.title = L10n.tr("auth.passcode.title")
         transitionTo([vc])
     }
 
@@ -94,7 +94,7 @@ final class AppCoordinator: Coordinator {
             onLockout: { [weak self] in self?.startLogin() }
         )
         let vc = UIHostingController(rootView: view)
-        vc.title = "Разблокировка"
+        vc.title = L10n.tr("auth.unlock.title")
         transitionTo([vc])
     }
 

@@ -6,6 +6,7 @@ import Combine
 final class SettingsScreenViewModel: ObservableObject {
     @Published var notificationsOn: Bool
     @Published var appearance: AppTheme
+    @Published var language: AppLanguage
     @Published var biometricsOn: Bool
     @Published var biometricsUnavailableReason: String?
     @Published var showBiometricsConfirm: Bool = false
@@ -13,11 +14,12 @@ final class SettingsScreenViewModel: ObservableObject {
     private let settings = SettingsViewModel()
     private let authManager: AuthManager
 
-    init(authManager: AuthManager = .shared) {
-        self.authManager = authManager
+    init(authManager: AuthManager? = nil) {
+        self.authManager = authManager ?? .shared
         self.notificationsOn = settings.currentNotifications
         self.appearance = AppTheme(rawValue: settings.currentAppearanceIndex) ?? .system
-        self.biometricsOn = authManager.isBiometricsEnabled
+        self.language = settings.currentLanguage
+        self.biometricsOn = self.authManager.isBiometricsEnabled
         self.refreshBiometricsAvailability()
     }
 
@@ -29,6 +31,11 @@ final class SettingsScreenViewModel: ObservableObject {
     func setAppearance(_ theme: AppTheme) {
         appearance = theme
         settings.updateAppearance(theme.rawValue)
+    }
+
+    func setLanguage(_ language: AppLanguage) {
+        self.language = language
+        settings.currentLanguage = language
     }
 
     func refreshBiometricsAvailability() {
@@ -76,42 +83,53 @@ struct SettingsScreen: View {
 
     var body: some View {
         Form {
-            Section("Уведомления") {
-                Toggle("Уведомления", isOn: Binding(
+            Section(L10n.tr("settings.notifications.section")) {
+                Toggle(L10n.tr("settings.notifications.toggle"), isOn: Binding(
                     get: { viewModel.notificationsOn },
                     set: { viewModel.setNotifications($0) }
                 ))
             }
 
-            Section("Внешний вид") {
-                Picker("Тема", selection: Binding(
+            Section(L10n.tr("settings.appearance.section")) {
+                Picker(L10n.tr("settings.theme.title"), selection: Binding(
                     get: { viewModel.appearance },
                     set: { viewModel.setAppearance($0) }
                 )) {
-                    Text("Системная").tag(AppTheme.system)
-                    Text("Светлая").tag(AppTheme.light)
-                    Text("Тёмная").tag(AppTheme.dark)
+                    Text(L10n.tr("settings.theme.system")).tag(AppTheme.system)
+                    Text(L10n.tr("settings.theme.light")).tag(AppTheme.light)
+                    Text(L10n.tr("settings.theme.dark")).tag(AppTheme.dark)
                 }
                 .pickerStyle(.segmented)
             }
 
-            Section("Безопасность") {
+            Section(L10n.tr("settings.language.section")) {
+                Picker(L10n.tr("settings.language.title"), selection: Binding(
+                    get: { viewModel.language },
+                    set: { viewModel.setLanguage($0) }
+                )) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+            }
+
+            Section(L10n.tr("settings.security.section")) {
                 NavigationLink {
                     PasscodeChangeScreen(viewModel: PasscodeChangeViewModel(authManager: .shared))
                 } label: {
-                    Label("Сменить код-пароль", systemImage: "lock.rotation")
+                    Label(L10n.tr("settings.change_passcode"), systemImage: "lock.rotation")
                 }
 
-                Toggle("Login with Face ID / Touch ID", isOn: Binding(
+                Toggle(L10n.tr("settings.biometrics.login_toggle"), isOn: Binding(
                     get: { viewModel.biometricsOn },
                     set: { viewModel.setBiometrics($0) }
                 ))
                 .disabled(viewModel.biometricsUnavailableReason != nil)
-                .alert("Использовать Face ID / Touch ID?", isPresented: $viewModel.showBiometricsConfirm) {
-                    Button("Да") { viewModel.confirmEnableBiometrics(true) }
-                    Button("Нет", role: .cancel) { viewModel.confirmEnableBiometrics(false) }
+                .alert(L10n.tr("settings.biometrics.alert_title"), isPresented: $viewModel.showBiometricsConfirm) {
+                    Button(L10n.tr("common.yes")) { viewModel.confirmEnableBiometrics(true) }
+                    Button(L10n.tr("common.no"), role: .cancel) { viewModel.confirmEnableBiometrics(false) }
                 } message: {
-                    Text("Если включено — вы сможете входить с помощью биометрии. Иначе будет запрашиваться код‑пароль.")
+                    Text(L10n.tr("settings.biometrics.alert_message"))
                 }
 
                 if let reason = viewModel.biometricsUnavailableReason {
@@ -119,13 +137,14 @@ struct SettingsScreen: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("Если выключено — вход выполняется по коду‑паролю.")
+                    Text(L10n.tr("settings.biometrics.footer"))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
         }
-        .navigationTitle("Настройки")
+        .navigationTitle(L10n.tr("settings.title"))
         .onAppear { viewModel.refreshBiometricsAvailability() }
+        .appLocalized()
     }
 }

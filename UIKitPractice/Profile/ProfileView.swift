@@ -33,7 +33,7 @@ final class ProfileView: UIView {
     // КРАСИВАЯ КНОПКА ВЫХОДА — всё в одном месте и без ошибок
     private lazy var logoutButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = "Выйти из аккаунта"
+        config.title = L10n.tr("Выйти из аккаунта")
         
         // Иконка поменьше и аккуратнее
         let icon = UIImage(systemName: "rectangle.portrait.and.arrow.right",
@@ -77,7 +77,9 @@ final class ProfileView: UIView {
     private var username: String = ""
     private var email: String?
 
-    private let sections: [String] = ["Профиль", "Настройки", "Поддержка"]
+    private var sections: [String] {
+        [L10n.tr("Профиль"), L10n.tr("Настройки"), L10n.tr("support.title")]
+    }
 
     // MARK: - Init
     override init(frame: CGRect) {
@@ -188,16 +190,16 @@ extension ProfileView: UITableViewDataSource, UITableViewDelegate {
         
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            content.text = "Редактировать профиль"
+            content.text = L10n.tr("profile.edit_profile")
             content.image = UIImage(systemName: "pencil")
         case (0, 1):
-            content.text = "Личные данные"
+            content.text = L10n.tr("Личные данные")
             content.image = UIImage(systemName: "person.text.rectangle")
         case (1, _):
-            content.text = "Настройки"
+            content.text = L10n.tr("Настройки")
             content.image = UIImage(systemName: "gearshape")
         case (2, _):
-            content.text = "Поддержка"
+            content.text = L10n.tr("support.title")
             content.image = UIImage(systemName: "questionmark.circle")
         default:
             break

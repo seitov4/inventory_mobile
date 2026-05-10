@@ -15,6 +15,8 @@ final class MainCoordinator: NSObject, Coordinator {
 
     private var profileCoordinator: ProfileCoordinator?
     private var tabBarController: UITabBarController?
+    private var analyticsNavController: UINavigationController?
+    private var productsNavController: UINavigationController?
     private var quickNavController: UINavigationController?
     private var notificationsNavController: UINavigationController?
     private var profileNavController: UINavigationController?
@@ -31,11 +33,13 @@ final class MainCoordinator: NSObject, Coordinator {
         let analytics = AnalyticsCoordinator(navigationController: analyticsNav)
         analytics.start()
         childCoordinators.append(analytics)
+        analyticsNavController = analyticsNav
 
         let productsNav = UINavigationController()
         let products = ProductsCoordinator(navigationController: productsNav)
         products.start()
         childCoordinators.append(products)
+        productsNavController = productsNav
 
         let quickNav = UINavigationController()
         let quick = QuickSaleCoordinator(navigationController: quickNav)
@@ -59,11 +63,11 @@ final class MainCoordinator: NSObject, Coordinator {
         // MARK: - TabBarController
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [
-            createTab(nav: analyticsNav, title: "Аналитика", image: "chart.bar.fill", tag: 0),
-            createTab(nav: productsNav, title: "Товары", image: "cube.fill", tag: 1),
-            createTab(nav: quickNav, title: "Продажа", image: "qrcode.viewfinder", tag: 2),
-            createTab(nav: notificationsNav, title: "Уведомления", image: "bell.fill", tag: 3),
-            createTab(nav: profileNav, title: "Профиль", image: "person.fill", tag: 4)
+            createTab(nav: analyticsNav, title: L10n.tr("tab.analytics"), image: "chart.bar.fill", tag: 0),
+            createTab(nav: productsNav, title: L10n.tr("tab.products"), image: "cube.fill", tag: 1),
+            createTab(nav: quickNav, title: L10n.tr("tab.sales"), image: "qrcode.viewfinder", tag: 2),
+            createTab(nav: notificationsNav, title: L10n.tr("tab.notifications"), image: "bell.fill", tag: 3),
+            createTab(nav: profileNav, title: L10n.tr("tab.profile"), image: "person.fill", tag: 4)
         ]
 
         // MARK: - TabBar Appearance
@@ -101,6 +105,7 @@ final class MainCoordinator: NSObject, Coordinator {
         tabBarController.tabBar.selectionIndicatorImage = UIImage()
         tabBarController.tabBar.itemPositioning = .fill
         self.tabBarController = tabBarController
+        observeLanguageChanges()
 
         if window.rootViewController == nil {
             window.rootViewController = tabBarController
@@ -150,5 +155,22 @@ final class MainCoordinator: NSObject, Coordinator {
 
         nav.tabBarItem = item
         return nav
+    }
+
+    private func observeLanguageChanges() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(languageDidChange),
+            name: .appLanguageDidChange,
+            object: nil
+        )
+    }
+
+    @objc private func languageDidChange() {
+        analyticsNavController?.tabBarItem.title = L10n.tr("tab.analytics")
+        productsNavController?.tabBarItem.title = L10n.tr("tab.products")
+        quickNavController?.tabBarItem.title = L10n.tr("tab.sales")
+        notificationsNavController?.tabBarItem.title = L10n.tr("tab.notifications")
+        profileNavController?.tabBarItem.title = L10n.tr("tab.profile")
     }
 }

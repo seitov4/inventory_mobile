@@ -13,13 +13,14 @@ final class ProfileScreenViewModel: ObservableObject {
     @Published var enterpriseViewModel: MyEnterpriseViewModel
 
     private let avatarStore: ProfileAvatarStoring
+    private var languageObserver: NSObjectProtocol?
 
     init(
-        fullName: String = "Иван Иванов",
+        fullName: String = L10n.tr("profile.default_name"),
         email: String = "ivan@example.com",
         phone: String = "+7 700 123 45 67",
-        role: String = "Администратор",
-        position: String = "Управляющий магазином",
+        role: String = L10n.tr("profile.default_role"),
+        position: String = L10n.tr("profile.default_position"),
         enterpriseViewModel: MyEnterpriseViewModel? = nil,
         avatarStore: ProfileAvatarStoring? = nil
     ) {
@@ -32,6 +33,19 @@ final class ProfileScreenViewModel: ObservableObject {
         let avatarStore = avatarStore ?? ProfileAvatarStore.shared
         self.avatarStore = avatarStore
         self.avatarImage = avatarStore.loadAvatar()
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refreshLocalizedMockProfile()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     var initials: String {
@@ -57,6 +71,14 @@ final class ProfileScreenViewModel: ObservableObject {
     func deleteAvatar() {
         avatarImage = nil
         try? avatarStore.deleteAvatar()
+    }
+
+    private func refreshLocalizedMockProfile() {
+        if email == "ivan@example.com" {
+            fullName = L10n.tr("profile.default_name")
+            role = L10n.tr("profile.default_role")
+            position = L10n.tr("profile.default_position")
+        }
     }
 }
 
@@ -94,7 +116,7 @@ struct ProfileScreen: View {
                 .padding(.horizontal, 16)
                 .profileAppear(index: 1, active: hasAppeared)
 
-                ProfileGroupedCard(title: "Личные данные") {
+                ProfileGroupedCard(title: L10n.tr("Личные данные")) {
                     ProfileActionRow(
                         icon: "envelope.fill",
                         title: "Email",
@@ -107,7 +129,7 @@ struct ProfileScreen: View {
 
                     ProfileActionRow(
                         icon: "phone.fill",
-                        title: "Телефон",
+                        title: L10n.tr("Телефон"),
                         value: viewModel.phone,
                         showsChevron: true,
                         action: onPersonalDataTap
@@ -117,7 +139,7 @@ struct ProfileScreen: View {
 
                     ProfileActionRow(
                         icon: "briefcase.fill",
-                        title: "Должность",
+                        title: L10n.tr("Должность"),
                         value: viewModel.position,
                         showsChevron: true,
                         action: onPersonalDataTap
@@ -126,11 +148,11 @@ struct ProfileScreen: View {
                 .padding(.horizontal, 16)
                 .profileAppear(index: 2, active: hasAppeared)
 
-                ProfileGroupedCard(title: "Быстрые действия") {
+                ProfileGroupedCard(title: L10n.tr("Быстрые действия")) {
                     ProfileActionRow(
                         icon: "bell.fill",
-                        title: "Настройки",
-                        value: "Настроить",
+                        title: L10n.tr("Настройки"),
+                        value: L10n.tr("Настроить"),
                         showsChevron: true,
                         action: onSettingsTap
                     )
@@ -139,8 +161,8 @@ struct ProfileScreen: View {
 
                     ProfileActionRow(
                         icon: "globe",
-                        title: "Язык интерфейса",
-                        value: Locale.current.language.languageCode?.identifier.uppercased() ?? "RU",
+                        title: L10n.tr("Язык интерфейса"),
+                        value: LocalizationManager.shared.currentLanguage.rawValue.uppercased(),
                         showsChevron: true,
                         action: onSettingsTap
                     )
@@ -149,7 +171,7 @@ struct ProfileScreen: View {
 
                     ProfileActionRow(
                         icon: "lock.fill",
-                        title: "Сменить код-пароль",
+                        title: L10n.tr("Сменить код-пароль"),
                         value: nil,
                         showsChevron: true,
                         action: onChangePasswordTap
@@ -159,7 +181,7 @@ struct ProfileScreen: View {
                 .profileAppear(index: 3, active: hasAppeared)
 
                 Button(action: onLogoutTap) {
-                    Label("Выйти из аккаунта", systemImage: "rectangle.portrait.and.arrow.right")
+                    Label(L10n.tr("Выйти из аккаунта"), systemImage: "rectangle.portrait.and.arrow.right")
                         .font(.system(size: 17, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
@@ -173,8 +195,9 @@ struct ProfileScreen: View {
             .padding(.bottom, 36)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Профиль")
+        .navigationTitle(L10n.tr("Профиль"))
         .navigationBarTitleDisplayMode(.large)
+        .appLocalized()
         .onAppear {
             withAnimation(.easeOut(duration: 0.3)) {
                 hasAppeared = true
@@ -229,15 +252,15 @@ private struct ProfileHeaderCard: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Изменить фото профиля")
+                .accessibilityLabel(L10n.tr("Изменить фото профиля"))
 
                 HStack(spacing: 12) {
-                    Button("Изменить фото", action: onAvatarTap)
+                    Button(L10n.tr("Изменить фото"), action: onAvatarTap)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Color.accentColor)
 
                     if avatarImage != nil {
-                        Button("Удалить", action: onDeleteAvatarTap)
+                        Button(L10n.tr("Удалить"), action: onDeleteAvatarTap)
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(.red)
                             .transition(.opacity.combined(with: .scale))
@@ -304,15 +327,15 @@ private struct EnterpriseBannerCard: View {
                                 .foregroundStyle(.white)
                                 .lineLimit(2)
 
-                            Text("Ваше предприятие и команда")
+                            Text(L10n.tr("Ваше предприятие и команда"))
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.75))
                         }
                     }
 
                     HStack(spacing: 8) {
-                        EnterpriseStatBadge(text: "Сотрудников: \(employees.count)")
-                        EnterpriseStatBadge(text: "Активных: \(activeEmployeesCount)")
+                        EnterpriseStatBadge(text: L10n.format("profile.employee_count_format", employees.count))
+                        EnterpriseStatBadge(text: L10n.format("profile.active_count_format", activeEmployeesCount))
                     }
                 }
 
@@ -343,7 +366,7 @@ private struct EnterpriseBannerCard: View {
             .shadow(color: Color.accentColor.opacity(colorScheme == .dark ? 0.18 : 0.24), radius: 18, x: 0, y: 10)
         }
         .buttonStyle(ScalePressButtonStyle())
-        .accessibilityLabel("Моё предприятие")
+        .accessibilityLabel(L10n.tr("Моё предприятие"))
     }
 }
 

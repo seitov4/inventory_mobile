@@ -10,10 +10,24 @@ final class ProductsInventoryState: ObservableObject {
     @Published var errorMessage: String?
 
     private let viewModel: ProductsViewModel
+    private var languageObserver: NSObjectProtocol?
 
     init(viewModel: ProductsViewModel) {
         self.viewModel = viewModel
         bind()
+        languageObserver = NotificationCenter.default.addObserver(
+            forName: .appLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.load()
+        }
+    }
+
+    deinit {
+        if let languageObserver {
+            NotificationCenter.default.removeObserver(languageObserver)
+        }
     }
 
     var filteredProducts: [Product] {
@@ -54,6 +68,8 @@ enum InventoryFilter: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var title: String { L10n.tr(rawValue) }
+
     func matches(_ quantity: Int) -> Bool {
         switch self {
         case .all: return true
@@ -81,9 +97,9 @@ private enum InventoryStatus {
 
     var title: String {
         switch self {
-        case .normal: return "В наличии"
-        case .low: return "Мало"
-        case .critical: return "Критично"
+        case .normal: return L10n.tr("В наличии")
+        case .low: return L10n.tr("Мало")
+        case .critical: return L10n.tr("Критично")
         }
     }
 }
@@ -107,6 +123,7 @@ struct ProductsInventoryScreen: View {
             .padding(.bottom, 20)
         }
         .background(InventoryTokens.background.ignoresSafeArea())
+        .appLocalized()
         .onAppear {
             if state.products.isEmpty {
                 state.load()
@@ -116,11 +133,11 @@ struct ProductsInventoryScreen: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Товары")
+            Text(L10n.tr("Товары"))
                 .font(.system(size: 30, weight: .bold, design: .default))
                 .foregroundStyle(InventoryTokens.foreground)
 
-            Text("Управление остатками товаров")
+            Text(L10n.tr("Управление остатками товаров"))
                 .font(.system(size: 14, weight: .regular))
                 .foregroundStyle(InventoryTokens.mutedForeground)
         }
@@ -129,7 +146,7 @@ struct ProductsInventoryScreen: View {
     private var statsGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
             StatCard(
-                label: "ВСЕГО ТОВАРОВ",
+                label: L10n.tr("ВСЕГО ТОВАРОВ"),
                 value: state.isLoading ? nil : "\(state.totalCount)",
                 icon: "shippingbox.fill",
                 iconColor: InventoryTokens.accentForeground,
@@ -137,7 +154,7 @@ struct ProductsInventoryScreen: View {
             )
 
             StatCard(
-                label: "МАЛО НА СКЛАДЕ",
+                label: L10n.tr("МАЛО НА СКЛАДЕ"),
                 value: state.isLoading ? nil : "\(state.lowStockCount)",
                 icon: "exclamationmark.triangle.fill",
                 iconColor: InventoryTokens.warning,
@@ -152,7 +169,7 @@ struct ProductsInventoryScreen: View {
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(InventoryTokens.mutedForeground)
 
-            TextField("Поиск товара", text: $state.searchText)
+            TextField(L10n.tr("Поиск товара"), text: $state.searchText)
                 .font(.system(size: 15))
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -179,7 +196,7 @@ struct ProductsInventoryScreen: View {
                             state.selectedFilter = filter
                         }
                     } label: {
-                        Text(filter.rawValue)
+                        Text(filter.title)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(state.selectedFilter == filter ? Color.white : InventoryTokens.foreground)
                             .padding(.horizontal, 16)
@@ -208,7 +225,7 @@ struct ProductsInventoryScreen: View {
                     Image(systemName: "shippingbox")
                         .font(.system(size: 40))
                         .foregroundStyle(InventoryTokens.mutedForeground.opacity(0.5))
-                    Text("Товары не найдены")
+                    Text(L10n.tr("Товары не найдены"))
                         .font(.system(size: 14))
                         .foregroundStyle(InventoryTokens.mutedForeground)
                 }
@@ -380,4 +397,3 @@ private enum InventoryTokens {
     static let destructive = Color(.systemRed)
     static let border = Color(.separator).opacity(0.35)
 }
-

@@ -97,7 +97,7 @@ final class PersonalDataView: UIView {
     // makeLogoutButton — оставь как был (он идеальный)
     private func makeLogoutButton() -> UIButton {
         var config = UIButton.Configuration.filled()
-        config.title = "Выйти из аккаунта"
+        config.title = L10n.tr("Выйти из аккаунта")
         
         let icon = UIImage(systemName: "rectangle.portrait.and.arrow.right")?
             .withConfiguration(UIImage.SymbolConfiguration(weight: .medium))

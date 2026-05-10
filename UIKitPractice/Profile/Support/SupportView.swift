@@ -63,12 +63,12 @@ final class SupportView: UIView {
         ])
 
         let title = UILabel()
-        title.text = "Поддержка"
+        title.text = L10n.tr("support.title")
         title.font = .systemFont(ofSize: 26, weight: .bold)
         title.textAlignment = .center
 
         let subtitle = UILabel()
-        subtitle.text = "Свяжитесь с нами любым удобным способом"
+        subtitle.text = L10n.tr("support.subtitle")
         subtitle.font = .systemFont(ofSize: 16)
         subtitle.textColor = .secondaryLabel
         subtitle.textAlignment = .center
@@ -76,7 +76,7 @@ final class SupportView: UIView {
 
         let phoneBtn = makeContactButton(
             title: "+7 707 626 06 76",
-            subtitle: "Позвонить",
+            subtitle: L10n.tr("support.call"),
             icon: "phone.fill",
             color: .systemGreen,
             action: { [weak self] in self?.callPhone() }
@@ -84,7 +84,7 @@ final class SupportView: UIView {
 
         let emailBtn = makeContactButton(
             title: emailAddress,
-            subtitle: "Написать письмо",
+            subtitle: L10n.tr("support.email"),
             icon: "envelope.fill",
             color: .systemBlue,
             action: { [weak self] in self?.sendEmail() }
@@ -92,14 +92,14 @@ final class SupportView: UIView {
 
         let tgBtn = makeContactButton(
             title: "@\(telegramUsername)",
-            subtitle: "Написать в Telegram",
+            subtitle: L10n.tr("support.telegram"),
             icon: "paperplane.fill",
             color: UIColor.systemIndigo,
             action: { [weak self] in self?.openTelegram() }
         )
 
         let info = UILabel()
-        info.text = "Отвечаем быстро • 9:00–21:00 • Без выходных"
+        info.text = L10n.tr("support.hours")
         info.font = .systemFont(ofSize: 15)
         info.textColor = .secondaryLabel
         info.textAlignment = .center

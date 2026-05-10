@@ -23,7 +23,7 @@ final class SettingsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Настройки"
+        title = L10n.tr("settings.title")
         // ensure current view reflects model
         settingsView.reload(withAppearance: viewModel.currentAppearanceIndex,
                             notificationsOn: viewModel.currentNotifications)
@@ -48,7 +48,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func openEditProfile() {
-        let vm = EditProfileViewModel(name: "Иван Иванов", email: "ivan@example.com")
+        let vm = EditProfileViewModel(name: L10n.tr("profile.default_name"), email: "ivan@example.com")
         let vc = EditProfileViewController(viewModel: vm)
         navigationController?.pushViewController(vc, animated: true)
     }

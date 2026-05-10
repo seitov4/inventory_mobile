@@ -49,7 +49,7 @@ final class ProfileCoordinator: Coordinator {
 
         profileVC.onShowEditProfile = { [weak self] in
             guard let self else { return }
-            let vm = EditProfileViewModel(name: "Иван Иванов", email: "ivan@example.com")
+            let vm = EditProfileViewModel(name: L10n.tr("profile.default_name"), email: "ivan@example.com")
             let vc = EditProfileViewController(viewModel: vm)
             self.navigationController.pushViewController(vc, animated: true)
         }
