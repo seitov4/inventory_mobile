@@ -20,6 +20,7 @@ final class MainCoordinator: NSObject, Coordinator {
     private var quickNavController: UINavigationController?
     private var notificationsNavController: UINavigationController?
     private var profileNavController: UINavigationController?
+    private var navigationControllersByTab: [AppTab: UINavigationController] = [:]
 
     init(window: UIWindow) {
         self.window = window
@@ -60,15 +61,17 @@ final class MainCoordinator: NSObject, Coordinator {
         profileCoordinator = profile
         profileNavController = profileNav
 
+        navigationControllersByTab = [
+            .analytics: analyticsNav,
+            .products: productsNav,
+            .sales: quickNav,
+            .notifications: notificationsNav,
+            .profile: profileNav
+        ]
+
         // MARK: - TabBarController
         let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [
-            createTab(nav: analyticsNav, title: L10n.tr("tab.analytics"), image: "chart.bar.fill", tag: 0),
-            createTab(nav: productsNav, title: L10n.tr("tab.products"), image: "cube.fill", tag: 1),
-            createTab(nav: quickNav, title: L10n.tr("tab.sales"), image: "qrcode.viewfinder", tag: 2),
-            createTab(nav: notificationsNav, title: L10n.tr("tab.notifications"), image: "bell.fill", tag: 3),
-            createTab(nav: profileNav, title: L10n.tr("tab.profile"), image: "person.fill", tag: 4)
-        ]
+        tabBarController.viewControllers = makeAllowedViewControllers()
 
         // MARK: - TabBar Appearance
         let appearance = UITabBarAppearance()
@@ -106,6 +109,7 @@ final class MainCoordinator: NSObject, Coordinator {
         tabBarController.tabBar.itemPositioning = .fill
         self.tabBarController = tabBarController
         observeLanguageChanges()
+        observeRoleChanges()
 
         if window.rootViewController == nil {
             window.rootViewController = tabBarController
@@ -127,13 +131,14 @@ final class MainCoordinator: NSObject, Coordinator {
         guard let tabBarController else { return }
         switch route {
         case .quickSale:
-            tabBarController.selectedIndex = 2
+            guard selectTab(.sales) else { return }
             quickNavController?.popToRootViewController(animated: false)
         case .notifications:
-            tabBarController.selectedIndex = 3
+            guard selectTab(.notifications) else { return }
             notificationsNavController?.popToRootViewController(animated: false)
         case .myEnterprise:
-            tabBarController.selectedIndex = 4
+            guard UserSessionManager.shared.currentRole.canViewEnterprise,
+                  selectTab(.profile) else { return }
             guard let profileNavController else { return }
             profileNavController.popToRootViewController(animated: false)
             let enterpriseVC = UIHostingController(rootView: MyEnterpriseScreen(viewModel: .mock()))
@@ -141,20 +146,37 @@ final class MainCoordinator: NSObject, Coordinator {
         }
     }
 
-    private func createTab(nav: UINavigationController, title: String, image: String, tag: Int) -> UINavigationController {
+    private func makeAllowedViewControllers() -> [UIViewController] {
+        UserSessionManager.shared.currentRole.allowedTabs.compactMap { tab in
+            guard let nav = navigationControllersByTab[tab] else { return nil }
+            return createTab(nav: nav, tab: tab)
+        }
+    }
+
+    private func createTab(nav: UINavigationController, tab: AppTab) -> UINavigationController {
         let config = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
-        let image = UIImage(systemName: image)?.withConfiguration(config)
+        let image = UIImage(systemName: tab.systemImage)?.withConfiguration(config)
 
         let item = UITabBarItem(
-            title: title,
+            title: L10n.tr(tab.titleKey),
             image: image,
             selectedImage: image
         )
 
-        item.tag = tag
+        item.tag = tab.rawValue
 
         nav.tabBarItem = item
         return nav
+    }
+
+    @discardableResult
+    private func selectTab(_ tab: AppTab) -> Bool {
+        guard let tabBarController,
+              let index = tabBarController.viewControllers?.firstIndex(where: { $0.tabBarItem.tag == tab.rawValue }) else {
+            return false
+        }
+        tabBarController.selectedIndex = index
+        return true
     }
 
     private func observeLanguageChanges() {
@@ -166,11 +188,32 @@ final class MainCoordinator: NSObject, Coordinator {
         )
     }
 
+    private func observeRoleChanges() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(roleDidChange),
+            name: .appUserRoleDidChange,
+            object: nil
+        )
+    }
+
     @objc private func languageDidChange() {
-        analyticsNavController?.tabBarItem.title = L10n.tr("tab.analytics")
-        productsNavController?.tabBarItem.title = L10n.tr("tab.products")
-        quickNavController?.tabBarItem.title = L10n.tr("tab.sales")
-        notificationsNavController?.tabBarItem.title = L10n.tr("tab.notifications")
-        profileNavController?.tabBarItem.title = L10n.tr("tab.profile")
+        navigationControllersByTab.forEach { tab, nav in
+            nav.tabBarItem.title = L10n.tr(tab.titleKey)
+        }
+    }
+
+    @objc private func roleDidChange() {
+        guard let tabBarController else { return }
+        let currentTag = tabBarController.selectedViewController?.tabBarItem.tag
+        let viewControllers = makeAllowedViewControllers()
+        tabBarController.setViewControllers(viewControllers, animated: true)
+
+        if let currentTag,
+           let index = viewControllers.firstIndex(where: { $0.tabBarItem.tag == currentTag }) {
+            tabBarController.selectedIndex = index
+        } else {
+            selectTab(.profile)
+        }
     }
 }

@@ -47,6 +47,7 @@ final class AuthService {
             switch result {
             case .success(let auth):
                 KeychainManager.shared.saveToken(auth.token)
+                UserSessionManager.shared.updateRole(fromBackend: auth.user.role)
                 completion(.success(auth.user))
             case .failure(let error):
                 completion(.failure(error))
@@ -54,4 +55,3 @@ final class AuthService {
         }
     }
 }
-

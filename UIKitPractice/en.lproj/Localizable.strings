@@ -27,6 +27,13 @@
 "settings.biometrics.alert_title" = "Use Face ID / Touch ID?";
 "settings.biometrics.alert_message" = "When enabled, you can sign in with biometrics. Otherwise the app passcode will be required.";
 "settings.biometrics.footer" = "When disabled, sign-in uses the app passcode.";
+"settings.role.section" = "User role";
+"settings.role.demo_title" = "Demo role";
+"settings.role.footer" = "Temporary switch for testing role-based interfaces. After backend integration, the role will come from the user profile.";
+
+"role.owner" = "Owner";
+"role.admin" = "Administrator";
+"role.employee" = "Employee";
 
 "Продажа" = "Sale";
 "Сканируйте товары — они появятся в чеке" = "Scan products and they will appear in the receipt";

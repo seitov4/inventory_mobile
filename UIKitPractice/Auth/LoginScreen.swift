@@ -42,6 +42,7 @@ final class LoginScreenViewModel: ObservableObject {
         if isMockLoginEnabled {
             // Mock a successful login so passcode flow can be tested without backend.
             KeychainManager.shared.saveToken("mock-token")
+            UserSessionManager.shared.ensureMockRoleIfNeeded()
             onSuccess()
             return
         }

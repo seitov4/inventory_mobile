@@ -10,16 +10,20 @@ final class SettingsScreenViewModel: ObservableObject {
     @Published var biometricsOn: Bool
     @Published var biometricsUnavailableReason: String?
     @Published var showBiometricsConfirm: Bool = false
+    @Published var role: AppUserRole
 
     private let settings = SettingsViewModel()
     private let authManager: AuthManager
+    private let sessionManager: UserSessionManager
 
-    init(authManager: AuthManager? = nil) {
+    init(authManager: AuthManager? = nil, sessionManager: UserSessionManager = .shared) {
         self.authManager = authManager ?? .shared
+        self.sessionManager = sessionManager
         self.notificationsOn = settings.currentNotifications
         self.appearance = AppTheme(rawValue: settings.currentAppearanceIndex) ?? .system
         self.language = settings.currentLanguage
         self.biometricsOn = self.authManager.isBiometricsEnabled
+        self.role = sessionManager.currentRole
         self.refreshBiometricsAvailability()
     }
 
@@ -36,6 +40,11 @@ final class SettingsScreenViewModel: ObservableObject {
     func setLanguage(_ language: AppLanguage) {
         self.language = language
         settings.currentLanguage = language
+    }
+
+    func setRole(_ role: AppUserRole) {
+        self.role = role
+        sessionManager.currentRole = role
     }
 
     func refreshBiometricsAvailability() {
@@ -112,6 +121,23 @@ struct SettingsScreen: View {
                     }
                 }
             }
+
+            #if DEBUG
+            Section {
+                Picker(L10n.tr("settings.role.demo_title"), selection: Binding(
+                    get: { viewModel.role },
+                    set: { viewModel.setRole($0) }
+                )) {
+                    ForEach(AppUserRole.allCases) { role in
+                        Text(role.displayName).tag(role)
+                    }
+                }
+            } header: {
+                Text(L10n.tr("settings.role.section"))
+            } footer: {
+                Text(L10n.tr("settings.role.footer"))
+            }
+            #endif
 
             Section(L10n.tr("settings.security.section")) {
                 NavigationLink {

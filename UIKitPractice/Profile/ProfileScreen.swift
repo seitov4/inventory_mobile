@@ -11,23 +11,28 @@ final class ProfileScreenViewModel: ObservableObject {
     @Published var position: String
     @Published var avatarImage: UIImage?
     @Published var enterpriseViewModel: MyEnterpriseViewModel
+    @Published var currentRole: AppUserRole
 
     private let avatarStore: ProfileAvatarStoring
+    private let sessionManager: UserSessionManager
     private var languageObserver: NSObjectProtocol?
+    private var roleObserver: NSObjectProtocol?
 
     init(
         fullName: String = L10n.tr("profile.default_name"),
         email: String = "ivan@example.com",
         phone: String = "+7 700 123 45 67",
-        role: String = L10n.tr("profile.default_role"),
         position: String = L10n.tr("profile.default_position"),
         enterpriseViewModel: MyEnterpriseViewModel? = nil,
-        avatarStore: ProfileAvatarStoring? = nil
+        avatarStore: ProfileAvatarStoring? = nil,
+        sessionManager: UserSessionManager = .shared
     ) {
+        self.sessionManager = sessionManager
         self.fullName = fullName
         self.email = email
         self.phone = phone
-        self.role = role
+        self.currentRole = sessionManager.currentRole
+        self.role = sessionManager.currentRole.displayName
         self.position = position
         self.enterpriseViewModel = enterpriseViewModel ?? MyEnterpriseViewModel.mock()
         let avatarStore = avatarStore ?? ProfileAvatarStore.shared
@@ -40,11 +45,21 @@ final class ProfileScreenViewModel: ObservableObject {
         ) { [weak self] _ in
             self?.refreshLocalizedMockProfile()
         }
+        roleObserver = NotificationCenter.default.addObserver(
+            forName: .appUserRoleDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            self?.applyRole(notification.object as? AppUserRole)
+        }
     }
 
     deinit {
         if let languageObserver {
             NotificationCenter.default.removeObserver(languageObserver)
+        }
+        if let roleObserver {
+            NotificationCenter.default.removeObserver(roleObserver)
         }
     }
 
@@ -73,12 +88,21 @@ final class ProfileScreenViewModel: ObservableObject {
         try? avatarStore.deleteAvatar()
     }
 
+    var canViewEnterprise: Bool {
+        currentRole.canViewEnterprise
+    }
+
     private func refreshLocalizedMockProfile() {
+        role = sessionManager.currentRole.displayName
         if email == "ivan@example.com" {
             fullName = L10n.tr("profile.default_name")
-            role = L10n.tr("profile.default_role")
             position = L10n.tr("profile.default_position")
         }
+    }
+
+    private func applyRole(_ role: AppUserRole?) {
+        currentRole = role ?? sessionManager.currentRole
+        self.role = currentRole.displayName
     }
 }
 
@@ -108,13 +132,15 @@ struct ProfileScreen: View {
                 )
                 .profileAppear(index: 0, active: hasAppeared)
 
-                EnterpriseBannerCard(
-                    enterprise: viewModel.enterpriseViewModel.enterprise,
-                    employees: viewModel.enterpriseViewModel.employees,
-                    onTap: onEnterpriseTap
-                )
-                .padding(.horizontal, 16)
-                .profileAppear(index: 1, active: hasAppeared)
+                if viewModel.canViewEnterprise {
+                    EnterpriseBannerCard(
+                        enterprise: viewModel.enterpriseViewModel.enterprise,
+                        employees: viewModel.enterpriseViewModel.employees,
+                        onTap: onEnterpriseTap
+                    )
+                    .padding(.horizontal, 16)
+                    .profileAppear(index: 1, active: hasAppeared)
+                }
 
                 ProfileGroupedCard(title: L10n.tr("Личные данные")) {
                     ProfileActionRow(

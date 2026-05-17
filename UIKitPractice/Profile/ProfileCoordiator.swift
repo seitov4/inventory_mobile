@@ -30,7 +30,8 @@ final class ProfileCoordinator: Coordinator {
         }
 
         profileVC.onShowEnterprise = { [weak self, weak profileVC] in
-            guard let self, let profileVC else { return }
+            guard let self, let profileVC,
+                  UserSessionManager.shared.currentRole.canViewEnterprise else { return }
             let vc = UIHostingController(rootView: MyEnterpriseScreen(viewModel: profileVC.profileScreenViewModel.enterpriseViewModel))
             self.navigationController.pushViewController(vc, animated: true)
         }
@@ -72,6 +73,7 @@ final class ProfileCoordinator: Coordinator {
 
     private func logout() {
         KeychainManager.shared.deleteToken()
+        UserSessionManager.shared.clear()
         let appCoordinator = AppCoordinator(window: window)
         childCoordinators.removeAll()
         childCoordinators.append(appCoordinator)
