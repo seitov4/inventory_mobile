@@ -64,6 +64,14 @@ struct QuickSaleScreen: View {
                 }
             )
         }
+        .fullScreenCover(item: $viewModel.checkoutRoute) { route in
+            SalesPaymentSetupScreen(
+                summary: route.summary,
+                onClose: { viewModel.dismissCheckout() },
+                onConnectPayment: { viewModel.connectPaymentInfrastructureForDemo() },
+                onFinishSale: { viewModel.finishSaleAfterPaymentSetup() }
+            )
+        }
         .appLocalized()
     }
 
@@ -307,24 +315,22 @@ struct QuickSaleScreen: View {
 
     private var stickyFooter: some View {
         HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.tr("Позиций"))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("sales.footer_total"))
                     .font(.system(size: 12))
                     .foregroundStyle(SalesColors.mutedForeground)
 
-                HStack(alignment: .firstTextBaseline, spacing: 5) {
-                    Text("\(viewModel.positionsCount)")
-                        .font(.system(size: 20, weight: .bold))
-                        .monospacedDigit()
-                        .foregroundStyle(SalesColors.foreground)
+                Text(viewModel.totalAmountFormatted)
+                    .font(.system(size: 20, weight: .bold))
+                    .monospacedDigit()
+                    .foregroundStyle(SalesColors.foreground)
 
-                    Text(L10n.format("sales.total_quantity_format", viewModel.totalQuantity))
-                        .font(.system(size: 14, weight: .semibold))
-                        .monospacedDigit()
-                        .foregroundStyle(SalesColors.mutedForeground)
-                }
+                Text(L10n.format("sales.footer_items_format", viewModel.positionsCount, viewModel.totalQuantity))
+                    .font(.system(size: 12, weight: .medium))
+                    .monospacedDigit()
+                    .foregroundStyle(SalesColors.mutedForeground)
             }
-            .frame(width: 112, alignment: .leading)
+            .frame(width: 132, alignment: .leading)
 
             Button {
                 viewModel.completeSale()
@@ -363,6 +369,242 @@ struct QuickSaleScreen: View {
                 .padding(.bottom, viewModel.hasItems ? 112 : 22)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .animation(.easeOut(duration: 0.2), value: toast.id)
+        }
+    }
+}
+
+private struct SalesPaymentSetupScreen: View {
+    let summary: SalesCheckoutSummary
+    let onClose: () -> Void
+    let onConnectPayment: () -> Void
+    let onFinishSale: () -> Void
+
+    @State private var isConnected = false
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 18) {
+                    header
+                    summaryCard
+                    requirementCard
+                    stepsCard
+                    actionArea
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 18)
+                .padding(.bottom, 28)
+            }
+            .background(SalesColors.background.ignoresSafeArea())
+            .navigationTitle(L10n.tr("sales.checkout.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(SalesColors.foreground)
+                            .frame(width: 34, height: 34)
+                            .background(Color(.secondarySystemFill), in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .appLocalized()
+    }
+
+    private var header: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(SalesColors.accent)
+                    .frame(width: 76, height: 76)
+
+                Image(systemName: isConnected ? "checkmark.seal.fill" : "creditcard.and.123")
+                    .font(.system(size: 34, weight: .semibold))
+                    .foregroundStyle(isConnected ? SalesColors.success : SalesColors.accentForeground)
+            }
+
+            VStack(spacing: 6) {
+                Text(isConnected ? L10n.tr("sales.checkout.connected_title") : L10n.tr("sales.checkout.setup_title"))
+                    .font(.system(size: 24, weight: .bold))
+                    .multilineTextAlignment(.center)
+
+                Text(isConnected ? L10n.tr("sales.checkout.connected_subtitle") : L10n.tr("sales.checkout.setup_subtitle"))
+                    .font(.system(size: 14))
+                    .foregroundStyle(SalesColors.mutedForeground)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 12)
+    }
+
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(L10n.tr("sales.checkout.summary"))
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(1)
+                .foregroundStyle(SalesColors.mutedForeground)
+
+            HStack(spacing: 12) {
+                CheckoutMetric(
+                    title: L10n.tr("sales.checkout.positions"),
+                    value: "\(summary.positionsCount)"
+                )
+                CheckoutMetric(
+                    title: L10n.tr("sales.checkout.quantity"),
+                    value: "\(summary.totalQuantity)"
+                )
+                CheckoutMetric(
+                    title: L10n.tr("sales.checkout.total"),
+                    value: summary.totalAmountFormatted
+                )
+            }
+        }
+        .padding(16)
+        .background(SalesColors.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(SalesColors.border, lineWidth: 1)
+        }
+        .shadow(color: UIChrome.cardShadowColor(for: colorScheme).opacity(0.4), radius: 10, x: 0, y: 4)
+    }
+
+    private var requirementCard: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: isConnected ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(isConnected ? SalesColors.success : SalesColors.warning)
+                .frame(width: 36, height: 36)
+                .background((isConnected ? SalesColors.success : SalesColors.warning).opacity(0.12), in: Circle())
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(isConnected ? L10n.tr("sales.checkout.ready_title") : L10n.tr("sales.checkout.required_title"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(SalesColors.foreground)
+
+                Text(isConnected ? L10n.tr("sales.checkout.ready_message") : L10n.tr("sales.checkout.required_message"))
+                    .font(.system(size: 13))
+                    .foregroundStyle(SalesColors.mutedForeground)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .background(SalesColors.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(SalesColors.border, lineWidth: 1)
+        }
+    }
+
+    private var stepsCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(L10n.tr("sales.checkout.steps_title"))
+                .font(.system(size: 15, weight: .semibold))
+
+            CheckoutStepRow(index: 1, title: L10n.tr("sales.checkout.step_qr"), systemImage: "qrcode")
+            CheckoutStepRow(index: 2, title: L10n.tr("sales.checkout.step_bank"), systemImage: "building.columns.fill")
+            CheckoutStepRow(index: 3, title: L10n.tr("sales.checkout.step_fiscal"), systemImage: "printer.fill")
+        }
+        .padding(16)
+        .background(SalesColors.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(SalesColors.border, lineWidth: 1)
+        }
+    }
+
+    private var actionArea: some View {
+        VStack(spacing: 10) {
+            Button {
+                if isConnected {
+                    onFinishSale()
+                } else {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isConnected = true
+                    }
+                    onConnectPayment()
+                }
+            } label: {
+                Label(
+                    isConnected ? L10n.tr("sales.checkout.finish_sale") : L10n.tr("sales.checkout.connect_payment"),
+                    systemImage: isConnected ? "checkmark" : "link"
+                )
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(SalesColors.primary, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .buttonStyle(PlainScaleButtonStyle(scale: 0.98))
+
+            Button(action: onClose) {
+                Text(L10n.tr("sales.checkout.back_to_receipt"))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(SalesColors.foreground)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .buttonStyle(PlainScaleButtonStyle(scale: 0.98))
+        }
+        .padding(.top, 4)
+    }
+}
+
+private struct CheckoutMetric: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(SalesColors.mutedForeground)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+
+            Text(value)
+                .font(.system(size: 16, weight: .bold))
+                .monospacedDigit()
+                .foregroundStyle(SalesColors.foreground)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private struct CheckoutStepRow: View {
+    let index: Int
+    let title: String
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text("\(index)")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(SalesColors.accentForeground)
+                .frame(width: 28, height: 28)
+                .background(SalesColors.accent, in: Circle())
+
+            Image(systemName: systemImage)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(SalesColors.mutedForeground)
+                .frame(width: 22)
+
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(SalesColors.foreground)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
         }
     }
 }

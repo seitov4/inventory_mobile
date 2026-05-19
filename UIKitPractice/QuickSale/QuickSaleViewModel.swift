@@ -13,6 +13,7 @@ final class QuickSaleViewModel {
 
     private(set) var cartItems: [SalesCartItem] = []
     var toast: SalesToast?
+    var checkoutRoute: SalesCheckoutRoute?
 
     private let productsService: ProductsServiceProtocol
     private var productsByBarcode: [String: Product] = [:]
@@ -32,6 +33,14 @@ final class QuickSaleViewModel {
 
     var totalQuantity: Int {
         cartItems.reduce(0) { $0 + $1.quantity }
+    }
+
+    var totalAmount: Double {
+        cartItems.reduce(0) { $0 + $1.lineTotal }
+    }
+
+    var totalAmountFormatted: String {
+        AppCurrency.string(from: totalAmount)
     }
 
     var testProducts: [Product] {
@@ -117,6 +126,36 @@ final class QuickSaleViewModel {
     func completeSale() {
         guard hasItems else { return }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        checkoutRoute = .paymentSetup(makeCheckoutSummary())
+    }
+
+    func connectPaymentInfrastructureForDemo() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        showToast(L10n.tr("sales.payment_setup_connected_toast"), style: .success)
+    }
+
+    func finishSaleAfterPaymentSetup() {
+        guard hasItems else {
+            checkoutRoute = nil
+            return
+        }
+        checkoutRoute = nil
+        finalizeSale()
+    }
+
+    func dismissCheckout() {
+        checkoutRoute = nil
+    }
+
+    private func makeCheckoutSummary() -> SalesCheckoutSummary {
+        SalesCheckoutSummary(
+            positionsCount: positionsCount,
+            totalQuantity: totalQuantity,
+            totalAmount: totalAmount
+        )
+    }
+
+    private func finalizeSale() {
         clearCart()
         showToast(L10n.tr("sales.completed"), style: .success)
     }

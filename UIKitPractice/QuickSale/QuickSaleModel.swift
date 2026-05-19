@@ -11,8 +11,39 @@ struct SalesCartItem: Identifiable {
 
     var id: Int { product.id }
 
+    var lineTotal: Double {
+        product.price * Double(quantity)
+    }
+
     var remainingStock: Int {
         max(product.quantity - quantity, 0)
+    }
+}
+
+struct SalesCheckoutSummary: Identifiable, Equatable {
+    let id = UUID()
+    let positionsCount: Int
+    let totalQuantity: Int
+    let totalAmount: Double
+
+    var totalAmountFormatted: String {
+        AppCurrency.string(from: totalAmount)
+    }
+}
+
+enum SalesCheckoutRoute: Identifiable, Equatable {
+    case paymentSetup(SalesCheckoutSummary)
+
+    var id: UUID {
+        switch self {
+        case .paymentSetup(let summary): return summary.id
+        }
+    }
+
+    var summary: SalesCheckoutSummary {
+        switch self {
+        case .paymentSetup(let summary): return summary
+        }
     }
 }
 
