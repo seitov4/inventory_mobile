@@ -8,15 +8,51 @@ final class LoginScreenViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var loginType: LoginType = .email
+    @Published var language: AppLanguage = LocalizationManager.shared.currentLanguage
+    @Published var loginType: LoginType = .phone {
+        didSet {
+            if loginType == .phone {
+                ensurePhonePrefix()
+            }
+        }
+    }
 
     private let authService: AuthService
-    /// Temporary: allow skipping backend auth to demo passcode flow.
     private let isMockLoginEnabled: Bool
+    private let localizationManager: LocalizationManager
 
-    init(authService: AuthService = AuthService(), isMockLoginEnabled: Bool = true) {
-        self.authService = authService
+    init(
+        authService: AuthService? = nil,
+        isMockLoginEnabled: Bool = false,
+        localizationManager: LocalizationManager? = nil
+    ) {
+        self.authService = authService ?? AuthService()
         self.isMockLoginEnabled = isMockLoginEnabled
+        self.localizationManager = localizationManager ?? .shared
+        self.language = self.localizationManager.currentLanguage
+        ensurePhonePrefix()
+    }
+
+    func setLanguage(_ language: AppLanguage) {
+        self.language = language
+        localizationManager.currentLanguage = language
+    }
+
+    func updatePhone(_ value: String) {
+        let digits = value.filter(\.isNumber)
+        var nationalDigits = digits
+
+        if nationalDigits.hasPrefix("7") || nationalDigits.hasPrefix("8") {
+            nationalDigits.removeFirst()
+        }
+
+        phone = "+7" + nationalDigits.prefix(10)
+    }
+
+    func ensurePhonePrefix() {
+        if phone.isEmpty {
+            phone = "+7"
+        }
     }
 
     func login(onSuccess: @escaping () -> Void) {
@@ -29,8 +65,8 @@ final class LoginScreenViewModel: ObservableObject {
             guard !value.isEmpty else { errorMessage = L10n.tr("Введите email"); return }
             loginValue = value
         case .phone:
-            let value = phone.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !value.isEmpty else { errorMessage = L10n.tr("Введите номер телефона"); return }
+            let value = normalizedPhone
+            guard value.count > 2 else { errorMessage = L10n.tr("Введите номер телефона"); return }
             loginValue = value
         }
 
@@ -61,6 +97,14 @@ final class LoginScreenViewModel: ObservableObject {
             }
         }
     }
+
+    private var normalizedPhone: String {
+        let digits = phone.filter(\.isNumber)
+        if digits.hasPrefix("7") {
+            return "+" + digits
+        }
+        return "+7" + digits
+    }
 }
 
 struct LoginScreen: View {
@@ -68,10 +112,17 @@ struct LoginScreen: View {
     let onLoginSuccess: () -> Void
 
     @FocusState private var focus: Field?
+    @State private var isPasswordVisible = false
     private enum Field { case email, password }
 
     var body: some View {
         VStack(spacing: 20) {
+            HStack {
+                Spacer()
+                languageMenu
+            }
+            .padding(.horizontal, 24)
+
             Spacer(minLength: 0)
 
             Text("InventiX")
@@ -80,11 +131,16 @@ struct LoginScreen: View {
 
             VStack(spacing: 12) {
                 Picker("", selection: $viewModel.loginType) {
-                    Text("Email").tag(LoginType.email)
                     Text(L10n.tr("Телефон")).tag(LoginType.phone)
+                    Text("Email").tag(LoginType.email)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 24)
+                .onChange(of: viewModel.loginType) { _, newValue in
+                    if newValue == .phone {
+                        viewModel.ensurePhonePrefix()
+                    }
+                }
 
                 if viewModel.loginType == .email {
                     TextField("Email", text: $viewModel.email)
@@ -97,7 +153,10 @@ struct LoginScreen: View {
                         .onSubmit { focus = .password }
                         .modifier(AuthTextFieldStyle())
                 } else {
-                    TextField(L10n.tr("Номер телефона"), text: $viewModel.phone)
+                    TextField(L10n.tr("Номер телефона"), text: Binding(
+                        get: { viewModel.phone },
+                        set: { viewModel.updatePhone($0) }
+                    ))
                         .textContentType(.telephoneNumber)
                         .keyboardType(.phonePad)
                         .textInputAutocapitalization(.never)
@@ -108,12 +167,31 @@ struct LoginScreen: View {
                         .modifier(AuthTextFieldStyle())
                 }
 
-                SecureField(L10n.tr("Пароль"), text: $viewModel.password)
+                HStack(spacing: 10) {
+                    Group {
+                        if isPasswordVisible {
+                            TextField(L10n.tr("Пароль"), text: $viewModel.password)
+                        } else {
+                            SecureField(L10n.tr("Пароль"), text: $viewModel.password)
+                        }
+                    }
                     .textContentType(.password)
                     .focused($focus, equals: .password)
                     .submitLabel(.go)
                     .onSubmit { viewModel.login(onSuccess: onLoginSuccess) }
-                    .modifier(AuthTextFieldStyle())
+
+                    Button {
+                        isPasswordVisible.toggle()
+                    } label: {
+                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 34, height: 34)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(isPasswordVisible ? L10n.tr("auth.password_hide") : L10n.tr("auth.password_show"))
+                }
+                .modifier(AuthTextFieldStyle())
             }
 
             if let error = viewModel.errorMessage {
@@ -159,9 +237,47 @@ struct LoginScreen: View {
         }
         .padding(.top, 24)
         .background(Color(.systemBackground))
-        .onAppear { focus = .email }
+        .onAppear {
+            viewModel.ensurePhonePrefix()
+            focus = .email
+        }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
         .appLocalized()
+    }
+
+    private var languageMenu: some View {
+        Menu {
+            ForEach(AppLanguage.allCases) { language in
+                Button {
+                    viewModel.setLanguage(language)
+                } label: {
+                    Label {
+                        Text(language.displayName)
+                    } icon: {
+                        if language == viewModel.language {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "globe")
+                    .font(.system(size: 14, weight: .semibold))
+                Text(viewModel.language.rawValue.uppercased())
+                    .font(.system(size: 14, weight: .semibold))
+                    .monospaced()
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12)
+            .frame(height: 36)
+            .background(Color(.secondarySystemBackground), in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color(.separator), lineWidth: 1)
+            )
+        }
+        .accessibilityLabel(L10n.tr("auth.language_selector"))
     }
 }
 

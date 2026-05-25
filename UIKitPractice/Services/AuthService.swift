@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AuthResponse: Decodable {
+private struct AuthPayload: Decodable {
     let token: String
     let user: User
 }
@@ -16,11 +16,40 @@ struct User: Decodable {
     let id: Int
     let email: String?
     let phone: String?
-    let first_name: String
-    let last_name: String
+    let first_name: String?
+    let last_name: String?
     let store_name: String?
     let role: String
-    let created_at: String
+    let created_at: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case phone
+        case first_name
+        case last_name
+        case store_name
+        case role
+        case created_at
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(Int.self, forKey: .id) ?? 0
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        phone = try container.decodeIfPresent(String.self, forKey: .phone)
+        first_name = try container.decodeIfPresent(String.self, forKey: .first_name)
+        last_name = try container.decodeIfPresent(String.self, forKey: .last_name)
+        store_name = try container.decodeIfPresent(String.self, forKey: .store_name)
+        role = try container.decodeIfPresent(String.self, forKey: .role) ?? "cashier"
+        created_at = try container.decodeIfPresent(String.self, forKey: .created_at)
+    }
+}
+
+private struct LoginRequest: Encodable {
+    let login: String
+    let email: String?
+    let password: String
 }
 
 final class AuthService {
@@ -31,19 +60,18 @@ final class AuthService {
         type: LoginType,
         completion: @escaping (Result<User, Error>) -> Void
     ) {
-        var body: [String: Any] = [
-            "password": password
-        ]
+        let request = LoginRequest(
+            login: login,
+            email: type == .email ? login : nil,
+            password: password
+        )
+        let data = try? JSONEncoder().encode(request)
 
-        body[type == .email ? "email" : "phone"] = login
-
-        let data = try? JSONSerialization.data(withJSONObject: body)
-
-        APIClient.shared.request(
+        APIClient.shared.requestEnvelope(
             endpoint: "auth/login",
             method: "POST",
             body: data
-        ) { (result: Result<AuthResponse, Error>) in
+        ) { (result: Result<AuthPayload, Error>) in
             switch result {
             case .success(let auth):
                 KeychainManager.shared.saveToken(auth.token)

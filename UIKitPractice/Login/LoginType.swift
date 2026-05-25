@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-enum LoginType {
+enum LoginType: Hashable {
     case email
     case phone
 }

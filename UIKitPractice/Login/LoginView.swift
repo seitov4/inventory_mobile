@@ -13,7 +13,7 @@ final class LoginView: UIView {
     let titleLabel = UILabel()
     let subtitleLabel = UILabel()
 
-    let loginTypeSegmented = UISegmentedControl(items: ["Email", L10n.tr("Телефон")])
+    let loginTypeSegmented = UISegmentedControl(items: [L10n.tr("Телефон"), "Email"])
 
     let loginField = UITextField()
     let passwordField = UITextField()
@@ -26,7 +26,7 @@ final class LoginView: UIView {
     private let errorLabel = UILabel()
     private let loginGradientLayer = CAGradientLayer()
 
-    private(set) var loginType: LoginType = .email
+    private(set) var loginType: LoginType = .phone
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -130,7 +130,7 @@ final class LoginView: UIView {
     // MARK: - Logic
 
     @objc private func loginTypeChanged() {
-        loginType = loginTypeSegmented.selectedSegmentIndex == 0 ? .email : .phone
+        loginType = loginTypeSegmented.selectedSegmentIndex == 0 ? .phone : .email
         updateLoginField()
         clearError()
     }
@@ -145,6 +145,26 @@ final class LoginView: UIView {
             loginField.placeholder = L10n.tr("Номер телефона")
             loginField.keyboardType = .phonePad
             loginField.leftView = createIconView(iconName: "phone")
+            ensurePhonePrefix()
+        }
+    }
+
+    func formatPhoneInput() {
+        guard loginType == .phone else { return }
+
+        let digits = loginField.text?.filter(\.isNumber) ?? ""
+        var nationalDigits = digits
+
+        if nationalDigits.hasPrefix("7") || nationalDigits.hasPrefix("8") {
+            nationalDigits.removeFirst()
+        }
+
+        loginField.text = "+7" + nationalDigits.prefix(10)
+    }
+
+    private func ensurePhonePrefix() {
+        if loginField.text?.isEmpty != false {
+            loginField.text = "+7"
         }
     }
 
@@ -194,6 +214,8 @@ final class LoginView: UIView {
 
     @objc private func togglePassword() {
         passwordField.isSecureTextEntry.toggle()
+        let imageName = passwordField.isSecureTextEntry ? "eye" : "eye.slash"
+        (passwordField.rightView as? UIButton)?.setImage(UIImage(systemName: imageName), for: .normal)
     }
 
     private func makeFilledButtonConfiguration(

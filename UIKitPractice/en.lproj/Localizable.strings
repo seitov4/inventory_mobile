@@ -299,3 +299,6 @@
 "support.telegram" = "Message on Telegram";
 "support.hours" = "Fast replies • 9:00–21:00 • Every day";
 "welcome.subtitle" = "Sign in or register";
+"auth.password_show" = "Show password";
+"auth.password_hide" = "Hide password";
+"auth.language_selector" = "Language selector";

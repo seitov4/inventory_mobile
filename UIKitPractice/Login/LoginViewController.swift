@@ -68,6 +68,7 @@ final class LoginViewController: UIViewController {
     }
 
     @objc private func textDidChange() {
+        rootView.formatPhoneInput()
         rootView.clearError()
     }
 

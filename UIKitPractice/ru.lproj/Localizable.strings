@@ -299,3 +299,6 @@
 "support.telegram" = "Написать в Telegram";
 "support.hours" = "Отвечаем быстро • 9:00–21:00 • Без выходных";
 "welcome.subtitle" = "Войти или зарегистрироваться";
+"auth.password_show" = "Показать пароль";
+"auth.password_hide" = "Скрыть пароль";
+"auth.language_selector" = "Выбор языка";
