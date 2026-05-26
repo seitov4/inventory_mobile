@@ -52,3 +52,77 @@ struct AnalyticsCategoryRow: Identifiable, Equatable {
 
     var id: String { name }
 }
+
+enum InventoryRiskPriority: Int, Comparable, Equatable {
+    case critical = 0
+    case warning = 1
+    case stable = 2
+
+    static func < (lhs: InventoryRiskPriority, rhs: InventoryRiskPriority) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .critical: return L10n.tr("analytics.stock.priority.critical")
+        case .warning: return L10n.tr("analytics.stock.priority.warning")
+        case .stable: return L10n.tr("analytics.stock.priority.stable")
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .critical: return "exclamationmark.triangle.fill"
+        case .warning: return "clock.badge.exclamationmark.fill"
+        case .stable: return "checkmark.seal.fill"
+        }
+    }
+}
+
+struct InventoryReorderRecommendation: Identifiable, Equatable {
+    let id: Int
+    let productName: String
+    let category: String
+    let stock: Int
+    let daysLeft: Int
+    let dailyDemand: Double
+    let reorderQuantity: Int
+    let estimatedCost: Double
+    let priority: InventoryRiskPriority
+
+    var estimatedCostFormatted: String {
+        AppCurrency.string(from: estimatedCost)
+    }
+
+    var dailyDemandText: String {
+        String(format: "%.1f", dailyDemand)
+    }
+}
+
+struct InventoryHealthInsight: Equatable {
+    let score: Int
+    let forecastDays: Int
+    let riskCount: Int
+    let criticalCount: Int
+    let totalBudget: Double
+    let preventedLostRevenue: Double
+    let recommendations: [InventoryReorderRecommendation]
+
+    static let empty = InventoryHealthInsight(
+        score: 100,
+        forecastDays: 7,
+        riskCount: 0,
+        criticalCount: 0,
+        totalBudget: 0,
+        preventedLostRevenue: 0,
+        recommendations: []
+    )
+
+    var totalBudgetFormatted: String {
+        AppCurrency.string(from: totalBudget)
+    }
+
+    var preventedLostRevenueFormatted: String {
+        AppCurrency.string(from: preventedLostRevenue)
+    }
+}

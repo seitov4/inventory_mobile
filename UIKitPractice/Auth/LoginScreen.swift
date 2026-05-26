@@ -23,7 +23,7 @@ final class LoginScreenViewModel: ObservableObject {
 
     init(
         authService: AuthService? = nil,
-        isMockLoginEnabled: Bool = false,
+        isMockLoginEnabled: Bool = true,
         localizationManager: LocalizationManager? = nil
     ) {
         self.authService = authService ?? AuthService()
@@ -58,6 +58,14 @@ final class LoginScreenViewModel: ObservableObject {
     func login(onSuccess: @escaping () -> Void) {
         errorMessage = nil
 
+        if isMockLoginEnabled {
+            // Mock a successful login so passcode flow can be tested without backend.
+            KeychainManager.shared.saveToken("mock-token")
+            UserSessionManager.shared.ensureMockRoleIfNeeded()
+            onSuccess()
+            return
+        }
+
         let loginValue: String
         switch loginType {
         case .email:
@@ -72,14 +80,6 @@ final class LoginScreenViewModel: ObservableObject {
 
         guard !password.isEmpty else {
             errorMessage = L10n.tr("Введите пароль")
-            return
-        }
-
-        if isMockLoginEnabled {
-            // Mock a successful login so passcode flow can be tested without backend.
-            KeychainManager.shared.saveToken("mock-token")
-            UserSessionManager.shared.ensureMockRoleIfNeeded()
-            onSuccess()
             return
         }
 

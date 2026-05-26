@@ -6,12 +6,14 @@
 import Charts
 import Observation
 import SwiftUI
+import UIKit
 
 struct AnalyticsScreen: View {
     @Bindable var viewModel: AnalyticsViewModel
     let onOpenAIChat: () -> Void
     @Environment(\.colorScheme) private var colorScheme
     @State private var isBannerVisible = false
+    @State private var isReorderPlanPresented = false
 
     var body: some View {
         ScrollView {
@@ -31,6 +33,8 @@ struct AnalyticsScreen: View {
 
                 metricsRow
 
+                inventoryForecastCard
+
                 chartCard
 
                 categoriesSection
@@ -41,11 +45,163 @@ struct AnalyticsScreen: View {
         }
         .background(Color(.systemGroupedBackground))
         .appLocalized()
+        .sheet(isPresented: $isReorderPlanPresented) {
+            InventoryReorderPlanSheet(insight: viewModel.inventoryInsight)
+                .appLocalized()
+        }
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) {
                 isBannerVisible = true
             }
         }
+    }
+
+    private var inventoryForecastCard: some View {
+        let insight = viewModel.inventoryInsight
+
+        return VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(Color(.systemBlue).opacity(0.12))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: "brain.head.profile")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(Color(.systemBlue))
+                }
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(L10n.tr("analytics.stock.title"))
+                        .font(.headline)
+                    Text(L10n.tr("analytics.stock.subtitle"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                Text("AI")
+                    .font(.caption.bold())
+                    .foregroundStyle(Color(.systemBlue))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(Color(.systemBlue).opacity(0.12), in: Capsule())
+            }
+
+            HStack(spacing: 16) {
+                Gauge(value: Double(insight.score), in: 0...100) {
+                    EmptyView()
+                } currentValueLabel: {
+                    Text("\(insight.score)")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                }
+                .gaugeStyle(.accessoryCircularCapacity)
+                .tint(healthTint(for: insight.score))
+                .frame(width: 92, height: 92)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(L10n.tr("analytics.stock.health_score"))
+                        .font(.subheadline.weight(.semibold))
+                    Text(L10n.format("analytics.stock.forecast_days_format", insight.forecastDays))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    HStack(spacing: 8) {
+                        insightPill(
+                            title: L10n.tr("analytics.stock.risk_items"),
+                            value: "\(insight.riskCount)",
+                            tint: insight.criticalCount > 0 ? Color(.systemRed) : Color(.systemOrange)
+                        )
+                        insightPill(
+                            title: L10n.tr("analytics.stock.budget"),
+                            value: insight.totalBudgetFormatted,
+                            tint: Color(.systemBlue)
+                        )
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(L10n.tr("analytics.stock.recommendations"))
+                        .font(.subheadline.weight(.semibold))
+                    Spacer()
+                    Text(L10n.tr("analytics.stock.live_badge"))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color(.systemGreen))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color(.systemGreen).opacity(0.12), in: Capsule())
+                }
+
+                if insight.recommendations.isEmpty {
+                    HStack(spacing: 10) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundStyle(Color(.systemGreen))
+                        Text(L10n.tr("analytics.stock.all_good"))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                } else {
+                    ForEach(insight.recommendations.prefix(3)) { item in
+                        InventoryRecommendationMiniRow(item: item)
+                    }
+                }
+            }
+
+            Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                isReorderPlanPresented = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "doc.text.magnifyingglass")
+                    Text(L10n.tr("analytics.stock.open_plan"))
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .frame(height: 48)
+                .background(Color(.systemBlue), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
+                .shadow(color: UIChrome.cardShadowColor(for: colorScheme), radius: 12, y: 5)
+        }
+    }
+
+    private func insightPill(title: String, value: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Text(value)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(tint)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func healthTint(for score: Int) -> Color {
+        if score >= 80 { return Color(.systemGreen) }
+        if score >= 55 { return Color(.systemOrange) }
+        return Color(.systemRed)
     }
 
     private var analyticsHeader: some View {
@@ -299,6 +455,221 @@ struct AnalyticsScreen: View {
             return String(format: "%.0fK", value / 1_000)
         }
         return String(format: "%.0f", value)
+    }
+}
+
+private struct InventoryRecommendationMiniRow: View {
+    let item: InventoryReorderRecommendation
+
+    var body: some View {
+        HStack(spacing: 11) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .fill(priorityTint.opacity(0.12))
+                    .frame(width: 40, height: 40)
+                Image(systemName: item.priority.systemImage)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(priorityTint)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.productName)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                Text(L10n.format("analytics.stock.days_left_format", item.daysLeft))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(L10n.format("analytics.stock.order_qty_format", item.reorderQuantity))
+                    .font(.caption.weight(.bold))
+                    .monospacedDigit()
+                Text(item.priority.title)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(priorityTint)
+            }
+        }
+        .padding(10)
+        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var priorityTint: Color {
+        switch item.priority {
+        case .critical: return Color(.systemRed)
+        case .warning: return Color(.systemOrange)
+        case .stable: return Color(.systemGreen)
+        }
+    }
+}
+
+private struct InventoryReorderPlanSheet: View {
+    let insight: InventoryHealthInsight
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var isDraftGenerated = false
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    headerCard
+                    summaryGrid
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(L10n.tr("analytics.stock.plan_items"))
+                            .font(.headline)
+
+                        if insight.recommendations.isEmpty {
+                            Text(L10n.tr("analytics.stock.plan_empty"))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .padding(16)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        } else {
+                            ForEach(insight.recommendations) { item in
+                                planRow(item)
+                            }
+                        }
+                    }
+
+                    Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                            isDraftGenerated = true
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: isDraftGenerated ? "checkmark.circle.fill" : "wand.and.stars")
+                            Text(isDraftGenerated ? L10n.tr("analytics.stock.draft_ready") : L10n.tr("analytics.stock.generate_draft"))
+                            Spacer()
+                        }
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .frame(height: 52)
+                        .background(Color(.systemBlue), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(16)
+                .padding(.bottom, 24)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(L10n.tr("analytics.stock.plan_title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(L10n.tr("common.done")) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    private var headerCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "shippingbox.and.arrow.backward.fill")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(Color(.systemBlue))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(L10n.tr("analytics.stock.plan_header"))
+                        .font(.headline)
+                    Text(L10n.tr("analytics.stock.plan_subtitle"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var summaryGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            summaryCard(L10n.tr("analytics.stock.health_score"), "\(insight.score)", "gauge.with.dots.needle.67percent")
+            summaryCard(L10n.tr("analytics.stock.risk_items"), "\(insight.riskCount)", "exclamationmark.triangle.fill")
+            summaryCard(L10n.tr("analytics.stock.budget"), insight.totalBudgetFormatted, "creditcard.fill")
+            summaryCard(L10n.tr("analytics.stock.saved_revenue"), insight.preventedLostRevenueFormatted, "chart.line.uptrend.xyaxis")
+        }
+    }
+
+    private func summaryCard(_ title: String, _ value: String, _ icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(Color(.systemBlue))
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func planRow(_ item: InventoryReorderRecommendation) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.productName)
+                        .font(.subheadline.weight(.semibold))
+                    Text(item.category)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Text(item.priority.title)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(priorityTint(for: item.priority))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(priorityTint(for: item.priority).opacity(0.12), in: Capsule())
+            }
+
+            HStack {
+                planFact(title: L10n.tr("analytics.stock.current_stock"), value: "\(item.stock)")
+                planFact(title: L10n.tr("analytics.stock.days_left"), value: "\(item.daysLeft)")
+                planFact(title: L10n.tr("analytics.stock.reorder"), value: "\(item.reorderQuantity)")
+                planFact(title: L10n.tr("analytics.stock.cost"), value: item.estimatedCostFormatted)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func planFact(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Text(value)
+                .font(.caption.weight(.bold))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func priorityTint(for priority: InventoryRiskPriority) -> Color {
+        switch priority {
+        case .critical: return Color(.systemRed)
+        case .warning: return Color(.systemOrange)
+        case .stable: return Color(.systemGreen)
+        }
     }
 }
 

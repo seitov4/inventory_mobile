@@ -16,9 +16,13 @@ final class AnalyticsViewModel {
     private(set) var metrics: [AnalyticsMetric] = []
     private(set) var dailySales: [AnalyticsDaySale] = []
     private(set) var categories: [AnalyticsCategoryRow] = []
+    private(set) var inventoryInsight: InventoryHealthInsight = .empty
+
+    private let productsService: ProductsServiceProtocol
     private var languageObserver: NSObjectProtocol?
 
-    init() {
+    init(productsService: ProductsServiceProtocol = MockProductsService()) {
+        self.productsService = productsService
         refresh()
         languageObserver = NotificationCenter.default.addObserver(
             forName: .appLanguageDidChange,
@@ -39,6 +43,24 @@ final class AnalyticsViewModel {
         metrics = Self.makeMetrics(for: period)
         dailySales = Self.makeDailySales(for: period)
         categories = Self.makeCategories(for: period)
+        loadInventoryInsight()
+    }
+
+    private func loadInventoryInsight() {
+        productsService.fetchProducts(category: nil, searchQuery: nil) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let response):
+                    self.inventoryInsight = Self.makeInventoryInsight(
+                        products: response.products,
+                        period: self.period
+                    )
+                case .failure:
+                    self.inventoryInsight = .empty
+                }
+            }
+        }
     }
 
     private static func makeMetrics(for period: AnalyticsPeriodKind) -> [AnalyticsMetric] {
@@ -140,5 +162,116 @@ final class AnalyticsViewModel {
                 revenueFormatted: cf.string(from: NSNumber(value: rev)) ?? "—"
             )
         }
+    }
+
+    private static func makeInventoryInsight(
+        products: [Product],
+        period: AnalyticsPeriodKind
+    ) -> InventoryHealthInsight {
+        let forecastDays = Swift.min(Swift.max(period.dayCount, 7), 14)
+        let demandMultiplier = demandMultiplier(for: period)
+
+        let allRecommendations = products.map {
+            makeReorderRecommendation(
+                for: $0,
+                forecastDays: forecastDays,
+                demandMultiplier: demandMultiplier
+            )
+        }
+
+        let recommendations = allRecommendations
+            .filter { $0.priority != InventoryRiskPriority.stable || $0.reorderQuantity > 0 }
+            .sorted {
+            if $0.priority != $1.priority {
+                return $0.priority < $1.priority
+            }
+            return $0.daysLeft < $1.daysLeft
+        }
+
+        let riskCount = recommendations.filter { $0.priority != InventoryRiskPriority.stable }.count
+        let criticalCount = recommendations.filter { $0.priority == InventoryRiskPriority.critical }.count
+        let warningCount = recommendations.filter { $0.priority == InventoryRiskPriority.warning }.count
+        let totalBudget = recommendations.reduce(0) { $0 + $1.estimatedCost }
+        let preventedLostRevenue = recommendations.reduce(0) { partial, item in
+            let shortageDays = Swift.max(0, forecastDays - item.daysLeft)
+            let expectedLostUnits = Double(shortageDays) * item.dailyDemand
+            let unitPrice = item.estimatedCost / Double(Swift.max(item.reorderQuantity, 1))
+            return partial + expectedLostUnits * Swift.max(unitPrice, 0)
+        }
+
+        let stableRiskCount = Swift.max(0, riskCount - criticalCount - warningCount)
+        let scorePenalty = criticalCount * 18 + warningCount * 9 + stableRiskCount * 4
+        let score = Swift.max(28, Swift.min(100, 100 - scorePenalty))
+
+        return InventoryHealthInsight(
+            score: score,
+            forecastDays: forecastDays,
+            riskCount: riskCount,
+            criticalCount: criticalCount,
+            totalBudget: totalBudget,
+            preventedLostRevenue: preventedLostRevenue,
+            recommendations: recommendations
+        )
+    }
+
+    private static func demandMultiplier(for period: AnalyticsPeriodKind) -> Double {
+        switch period {
+        case .week:
+            return 1.0
+        case .month:
+            return 1.15
+        case .quarter:
+            return 1.3
+        }
+    }
+
+    private static func makeReorderRecommendation(
+        for product: Product,
+        forecastDays: Int,
+        demandMultiplier: Double
+    ) -> InventoryReorderRecommendation {
+        let threshold = product.lowStockThreshold ?? 8
+        let deterministicBoost = Double((product.id % 4) + 1) * 0.35
+        let baseDemand = Double(threshold) / 4.0 + deterministicBoost
+        let dailyDemand = Swift.max(0.8, baseDemand * demandMultiplier)
+        let safeQuantity = Swift.max(product.quantity, 0)
+        let daysLeft = Swift.max(1, Int(ceil(Double(safeQuantity) / dailyDemand)))
+        let targetStock = Int(ceil(dailyDemand * Double(forecastDays + 7)))
+        let reorderQuantity = Swift.max(0, targetStock - product.quantity)
+        let priority = reorderPriority(
+            product: product,
+            threshold: threshold,
+            daysLeft: daysLeft,
+            forecastDays: forecastDays
+        )
+
+        return InventoryReorderRecommendation(
+            id: product.id,
+            productName: product.name,
+            category: product.category,
+            stock: product.quantity,
+            daysLeft: daysLeft,
+            dailyDemand: dailyDemand,
+            reorderQuantity: reorderQuantity,
+            estimatedCost: Double(reorderQuantity) * product.price,
+            priority: priority
+        )
+    }
+
+    private static func reorderPriority(
+        product: Product,
+        threshold: Int,
+        daysLeft: Int,
+        forecastDays: Int
+    ) -> InventoryRiskPriority {
+        if product.quantity <= Swift.max(1, threshold / 2) || daysLeft <= 3 {
+            return .critical
+        }
+
+        if product.isLowStock || daysLeft <= forecastDays {
+            return .warning
+        }
+
+        return .stable
     }
 }
