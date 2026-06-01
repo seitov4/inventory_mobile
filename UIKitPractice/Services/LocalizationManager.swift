@@ -51,11 +51,18 @@ final class LocalizationManager {
             return language
         }
         set {
+            let oldValue = currentLanguage
             UserDefaults.standard.set(newValue.rawValue, forKey: languageKey)
             UserDefaults.standard.set([newValue.localeIdentifier], forKey: "AppleLanguages")
             UserDefaults.standard.synchronize()
             Bundle.setAppLanguage(newValue.localeIdentifier)
             NotificationCenter.default.post(name: .appLanguageDidChange, object: newValue)
+            if oldValue != newValue {
+                AppAnalytics.shared.track(.languageChanged, properties: [
+                    "from": .string(oldValue.rawValue),
+                    "to": .string(newValue.rawValue)
+                ])
+            }
         }
     }
 

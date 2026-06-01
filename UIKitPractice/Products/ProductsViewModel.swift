@@ -67,6 +67,11 @@ final class ProductsViewModel {
                     self?.filterProducts()
                     self?.onProductsLoaded?(self?.filteredProducts ?? [], response.stats)
                     self?.onCategoriesLoaded?(self?.categories ?? [])
+                    AppAnalytics.shared.track(.productListLoaded, properties: [
+                        "count": .int(response.products.count),
+                        "category": .string(self?.selectedCategory.name ?? "all"),
+                        "has_search": .bool(!(self?.searchQuery.isEmpty ?? true))
+                    ])
                     
                 case .failure(let error):
                     // В mock-режиме не показываем ошибки

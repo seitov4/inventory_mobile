@@ -57,11 +57,20 @@ final class LoginScreenViewModel: ObservableObject {
 
     func login(onSuccess: @escaping () -> Void) {
         errorMessage = nil
+        let method = loginType.analyticsValue
 
         if isMockLoginEnabled {
             // Mock a successful login so passcode flow can be tested without backend.
             KeychainManager.shared.saveToken("mock-token")
             UserSessionManager.shared.ensureMockRoleIfNeeded()
+            AppAnalytics.shared.identify(userID: "mock-user", properties: [
+                "role": .string(UserSessionManager.shared.currentRole.rawValue),
+                "auth_mode": "mock"
+            ])
+            AppAnalytics.shared.track(.loginSuccess, properties: [
+                "method": .string(method),
+                "auth_mode": "mock"
+            ])
             onSuccess()
             return
         }
@@ -83,15 +92,32 @@ final class LoginScreenViewModel: ObservableObject {
             return
         }
 
+        AppAnalytics.shared.track(.loginAttempt, properties: [
+            "method": .string(method)
+        ])
+
         isLoading = true
         authService.login(login: loginValue, password: password, type: loginType) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.isLoading = false
                 switch result {
-                case .success:
+                case .success(let user):
+                    AppAnalytics.shared.identify(userID: String(user.id), properties: [
+                        "role": .string(user.role),
+                        "auth_mode": "backend"
+                    ])
+                    AppAnalytics.shared.track(.loginSuccess, properties: [
+                        "method": .string(method),
+                        "role": .string(user.role),
+                        "auth_mode": "backend"
+                    ])
                     onSuccess()
                 case .failure(let error):
+                    AppAnalytics.shared.track(.loginFailure, properties: [
+                        "method": .string(method),
+                        "message": .string(error.localizedDescription)
+                    ])
                     self.errorMessage = error.localizedDescription
                 }
             }
@@ -278,6 +304,15 @@ struct LoginScreen: View {
             )
         }
         .accessibilityLabel(L10n.tr("auth.language_selector"))
+    }
+}
+
+private extension LoginType {
+    var analyticsValue: String {
+        switch self {
+        case .email: return "email"
+        case .phone: return "phone"
+        }
     }
 }
 

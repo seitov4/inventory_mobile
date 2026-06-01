@@ -72,6 +72,7 @@ final class ProfileCoordinator: Coordinator {
     }
 
     private func logout() {
+        AppAnalytics.shared.track(.logout)
         KeychainManager.shared.deleteToken()
         UserSessionManager.shared.clear()
         let appCoordinator = AppCoordinator(window: window)
