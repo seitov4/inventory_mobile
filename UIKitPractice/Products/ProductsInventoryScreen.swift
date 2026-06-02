@@ -125,6 +125,7 @@ struct ProductsInventoryScreen: View {
         .background(InventoryTokens.background.ignoresSafeArea())
         .appLocalized()
         .onAppear {
+            AppAnalytics.shared.trackScreen("products")
             if state.products.isEmpty {
                 state.load()
             }

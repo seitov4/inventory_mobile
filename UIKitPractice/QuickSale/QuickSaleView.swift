@@ -55,6 +55,9 @@ struct QuickSaleScreen: View {
             toastLayer
         }
         .animation(.easeOut(duration: 0.22), value: viewModel.hasItems)
+        .onAppear {
+            AppAnalytics.shared.trackScreen("sales")
+        }
         .fullScreenCover(isPresented: $isCameraPresented) {
             CameraScannerOverlay(
                 onClose: { isCameraPresented = false },

@@ -50,6 +50,7 @@ struct AnalyticsScreen: View {
                 .appLocalized()
         }
         .onAppear {
+            AppAnalytics.shared.trackScreen("analytics")
             withAnimation(.easeOut(duration: 0.35)) {
                 isBannerVisible = true
             }

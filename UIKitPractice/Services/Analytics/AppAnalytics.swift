@@ -20,6 +20,16 @@ enum AnalyticsEventName: String {
     case barcodeScanFailed = "barcode_scan_failed"
     case saleCheckoutStarted = "sale_checkout_started"
     case saleCompleted = "sale_completed"
+    case aiChatOpened = "ai_chat_opened"
+    case aiChatMessageSent = "ai_chat_message_sent"
+    case aiChatReplyReceived = "ai_chat_reply_received"
+    case aiChatReplyFailed = "ai_chat_reply_failed"
+    case aiChatAttachmentAdded = "ai_chat_attachment_added"
+    case notificationsChanged = "notifications_changed"
+    case notificationOpened = "notification_opened"
+    case notificationsMarkedAllRead = "notifications_marked_all_read"
+    case themeChanged = "theme_changed"
+    case biometricsChanged = "biometrics_changed"
 }
 
 enum AnalyticsPropertyValue: ExpressibleByStringLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByBooleanLiteral {
@@ -104,7 +114,11 @@ final class AppAnalytics {
             "role": UserSessionManager.shared.currentRole.rawValue,
             "platform": "ios",
             "device_model": UIDevice.current.model,
-            "system_version": UIDevice.current.systemVersion
+            "system_version": UIDevice.current.systemVersion,
+            "country_code": Locale.current.regionCode ?? "unknown",
+            "locale": Locale.current.identifier,
+            "preferred_language": Locale.preferredLanguages.first ?? "unknown",
+            "time_zone": TimeZone.current.identifier
         ]
     }
 }

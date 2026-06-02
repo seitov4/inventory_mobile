@@ -46,6 +46,9 @@ final class AnalyticsViewController: UIViewController {
     }
 
     private func openAIChat() {
+        AppAnalytics.shared.track(.aiChatOpened, properties: [
+            "source": "analytics_screen"
+        ])
         let chat = AIChatScreen(viewModel: AIChatViewModel(service: MockAIChatService()))
         let vc = UIHostingController(rootView: chat)
         vc.hidesBottomBarWhenPushed = true

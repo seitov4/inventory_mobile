@@ -30,11 +30,17 @@ final class SettingsScreenViewModel: ObservableObject {
     func setNotifications(_ isOn: Bool) {
         notificationsOn = isOn
         settings.toggleNotifications(isOn)
+        AppAnalytics.shared.track(.notificationsChanged, properties: [
+            "enabled": .bool(isOn)
+        ])
     }
 
     func setAppearance(_ theme: AppTheme) {
         appearance = theme
         settings.updateAppearance(theme.rawValue)
+        AppAnalytics.shared.track(.themeChanged, properties: [
+            "theme": .string(theme.analyticsValue)
+        ])
     }
 
     func setLanguage(_ language: AppLanguage) {
@@ -67,6 +73,9 @@ final class SettingsScreenViewModel: ObservableObject {
         } else {
             biometricsOn = false
             authManager.setBiometricsEnabled(false)
+            AppAnalytics.shared.track(.biometricsChanged, properties: [
+                "enabled": false
+            ])
         }
     }
 
@@ -80,9 +89,25 @@ final class SettingsScreenViewModel: ObservableObject {
             }
             biometricsOn = true
             authManager.setBiometricsEnabled(true)
+            AppAnalytics.shared.track(.biometricsChanged, properties: [
+                "enabled": true
+            ])
         } else {
             biometricsOn = false
             authManager.setBiometricsEnabled(false)
+            AppAnalytics.shared.track(.biometricsChanged, properties: [
+                "enabled": false
+            ])
+        }
+    }
+}
+
+private extension AppTheme {
+    var analyticsValue: String {
+        switch self {
+        case .system: return "system"
+        case .light: return "light"
+        case .dark: return "dark"
         }
     }
 }
@@ -170,7 +195,10 @@ struct SettingsScreen: View {
             }
         }
         .navigationTitle(L10n.tr("settings.title"))
-        .onAppear { viewModel.refreshBiometricsAvailability() }
+        .onAppear {
+            AppAnalytics.shared.trackScreen("settings")
+            viewModel.refreshBiometricsAvailability()
+        }
         .appLocalized()
     }
 }

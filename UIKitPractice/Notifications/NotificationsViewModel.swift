@@ -35,6 +35,9 @@ final class NotificationsViewModel {
             r.isUnread = false
             return r
         }
+        AppAnalytics.shared.track(.notificationsMarkedAllRead, properties: [
+            "count": .int(items.count)
+        ])
     }
 
     func markRead(_ item: StoreNotificationItem) {
@@ -42,6 +45,11 @@ final class NotificationsViewModel {
         var copy = items[i]
         copy.isUnread = false
         items[i] = copy
+        AppAnalytics.shared.track(.notificationOpened, properties: [
+            "notification_id": .string(item.id),
+            "bucket": .string(item.bucket.analyticsValue),
+            "was_unread": .bool(item.isUnread)
+        ])
     }
 
     func items(for bucket: NotificationTimeBucket) -> [StoreNotificationItem] {
@@ -120,5 +128,15 @@ final class NotificationsViewModel {
                 bucket: .week
             )
         ]
+    }
+}
+
+private extension NotificationTimeBucket {
+    var analyticsValue: String {
+        switch self {
+        case .today: return "today"
+        case .yesterday: return "yesterday"
+        case .week: return "week"
+        }
     }
 }

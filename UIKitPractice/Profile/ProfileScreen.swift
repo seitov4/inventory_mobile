@@ -225,6 +225,7 @@ struct ProfileScreen: View {
         .navigationBarTitleDisplayMode(.large)
         .appLocalized()
         .onAppear {
+            AppAnalytics.shared.trackScreen("profile")
             withAnimation(.easeOut(duration: 0.3)) {
                 hasAppeared = true
             }

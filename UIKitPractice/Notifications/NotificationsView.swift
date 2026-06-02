@@ -38,6 +38,9 @@ struct NotificationsScreen: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Color(.systemGroupedBackground))
+        .onAppear {
+            AppAnalytics.shared.trackScreen("notifications")
+        }
         .appLocalized()
     }
 

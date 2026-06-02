@@ -45,6 +45,7 @@ final class AIChatViewModel: ObservableObject {
     func send() {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard (!text.isEmpty || !pendingAttachments.isEmpty), !isTyping else { return }
+        let attachmentsCount = pendingAttachments.count
 
         let attachmentSuffix = pendingAttachments.isEmpty
             ? ""
@@ -57,6 +58,11 @@ final class AIChatViewModel: ObservableObject {
         inputText = ""
         pendingAttachments.removeAll()
         isTyping = true
+        AppAnalytics.shared.track(.aiChatMessageSent, properties: [
+            "text_length": .int(text.count),
+            "attachments_count": .int(attachmentsCount),
+            "is_attachment_only": .bool(text.isEmpty && attachmentsCount > 0)
+        ])
 
         Task { [weak self] in
             guard let self else { return }
@@ -65,19 +71,31 @@ final class AIChatViewModel: ObservableObject {
                 self.turns.append(.init(role: "assistant", content: reply))
                 self.messages.append(AIChatMessage(text: reply, isUser: false))
                 self.isTyping = false
+                AppAnalytics.shared.track(.aiChatReplyReceived, properties: [
+                    "reply_length": .int(reply.count)
+                ])
             } catch {
                 self.messages.append(AIChatMessage(text: L10n.tr("analytics.ai.error"), isUser: false))
                 self.isTyping = false
+                AppAnalytics.shared.track(.aiChatReplyFailed, properties: [
+                    "message": .string(error.localizedDescription)
+                ])
             }
         }
     }
 
     func addPhotoAttachment(name: String) {
         pendingAttachments.append(.init(name: name, kind: .photo))
+        AppAnalytics.shared.track(.aiChatAttachmentAdded, properties: [
+            "kind": "photo"
+        ])
     }
 
     func addFileAttachment(name: String) {
         pendingAttachments.append(.init(name: name, kind: .file))
+        AppAnalytics.shared.track(.aiChatAttachmentAdded, properties: [
+            "kind": "file"
+        ])
     }
 
     func removeAttachment(_ attachment: AIChatAttachment) {

@@ -76,6 +76,10 @@ final class QuickSaleViewModel {
 
         guard let product = productsByBarcode[barcode] else {
             playFailedScanSound()
+            AppAnalytics.shared.track(.barcodeScanFailed, properties: [
+                "barcode": .string(barcode),
+                "reason": "not_found"
+            ])
             showToast(L10n.format("sales.product_not_found_format", barcode), style: .destructive)
             return
         }
@@ -126,6 +130,7 @@ final class QuickSaleViewModel {
     func completeSale() {
         guard hasItems else { return }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        AppAnalytics.shared.track(.saleCheckoutStarted, properties: saleAnalyticsProperties())
         checkoutRoute = .paymentSetup(makeCheckoutSummary())
     }
 
@@ -156,6 +161,7 @@ final class QuickSaleViewModel {
     }
 
     private func finalizeSale() {
+        AppAnalytics.shared.track(.saleCompleted, properties: saleAnalyticsProperties())
         clearCart()
         showToast(L10n.tr("sales.completed"), style: .success)
     }
@@ -163,6 +169,13 @@ final class QuickSaleViewModel {
     private func add(_ product: Product, bypassDebounce: Bool = false, source: AddSource = .manual) {
         if product.quantity <= 0 {
             if source.playsScanSound { playFailedScanSound() }
+            if source.isScan {
+                AppAnalytics.shared.track(.barcodeScanFailed, properties: [
+                    "product_id": .int(product.id),
+                    "barcode": .string(product.barcode ?? ""),
+                    "reason": "out_of_stock"
+                ])
+            }
             showToast(L10n.tr("sales.out_of_stock"), style: .warning)
             return
         }
@@ -170,6 +183,13 @@ final class QuickSaleViewModel {
         if let index = cartItems.firstIndex(where: { $0.product.id == product.id }) {
             guard cartItems[index].quantity < product.quantity else {
                 if source.playsScanSound { playFailedScanSound() }
+                if source.isScan {
+                    AppAnalytics.shared.track(.barcodeScanFailed, properties: [
+                        "product_id": .int(product.id),
+                        "barcode": .string(product.barcode ?? ""),
+                        "reason": "stock_limit"
+                    ])
+                }
                 showToast(L10n.tr("sales.stock_limit"), style: .warning)
                 return
             }
@@ -188,6 +208,16 @@ final class QuickSaleViewModel {
             playSuccessScanSound()
         }
 
+        if source.isScan {
+            AppAnalytics.shared.track(.barcodeScanSuccess, properties: [
+                "product_id": .int(product.id),
+                "barcode": .string(product.barcode ?? ""),
+                "source": .string(source.analyticsValue),
+                "cart_positions": .int(positionsCount),
+                "cart_quantity": .int(totalQuantity)
+            ])
+        }
+
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
@@ -202,6 +232,29 @@ final class QuickSaleViewModel {
             case .manual: return false
             }
         }
+
+        var isScan: Bool {
+            switch self {
+            case .barcodeScan, .mock: return true
+            case .manual: return false
+            }
+        }
+
+        var analyticsValue: String {
+            switch self {
+            case .barcodeScan: return "barcode"
+            case .mock: return "mock"
+            case .manual: return "manual"
+            }
+        }
+    }
+
+    private func saleAnalyticsProperties() -> [String: AnalyticsPropertyValue] {
+        [
+            "positions": .int(positionsCount),
+            "quantity": .int(totalQuantity),
+            "total_amount": .double(totalAmount)
+        ]
     }
 
     private func playSuccessScanSound() {
