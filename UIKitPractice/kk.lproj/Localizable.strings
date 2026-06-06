@@ -131,6 +131,7 @@
 "auth.app_subtitle_alt" = "Тауарларды есепке алу жүйесі";
 "auth.sign_in_biometrics" = "Face ID / Touch ID арқылы кіру";
 "auth.invalid_credentials" = "Логин немесе құпиясөз қате";
+"auth.forbidden" = "Бұл әрекетке рұқсатыңыз жоқ";
 "auth.user_not_found" = "Пайдаланушы табылмады";
 "auth.server_unavailable" = "Сервер уақытша қолжетімсіз";
 "auth.decoding_error" = "Деректерді өңдеу қатесі";
@@ -330,3 +331,15 @@
 "analytics.stock.days_left" = "Күн";
 "analytics.stock.reorder" = "Толықтыру";
 "analytics.stock.cost" = "Сома";
+"products.category_uncategorized" = "Санатсыз";
+"analytics.subtitle.sales_days" = "Сатылым болған күндер";
+"analytics.subtitle.per_day" = "Күніне орташа";
+"analytics.subtitle.days_in_period" = "Кезеңдегі күндер";
+"enterprise.address_unavailable" = "Мекенжай көрсетілмеген";
+"enterprise.tax_id_unavailable" = "БСН көрсетілмеген";
+"sales.no_warehouse" = "Қойма табылмады";
+"error.network_offline" = "Интернет байланысы жоқ";
+"error.network_timeout" = "Сервер жауап бермейді. Кейінірек қайталап көріңіз";
+"error.network_ssl" = "Қауіпсіз қосылым орнатылмады";
+"error.network_generic" = "Желі қатесі. Қосылымды тексеріңіз";
+"error.invalid_url" = "Сервер мекенжайы дұрыс емес";

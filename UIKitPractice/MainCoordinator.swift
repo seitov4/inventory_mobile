@@ -127,23 +127,32 @@ final class MainCoordinator: NSObject, Coordinator {
         ThemeManager.shared.applySavedTheme()
     }
 
-    func openShortcut(_ route: AppShortcutRoute) {
-        guard let tabBarController else { return }
+    @discardableResult
+    func openShortcut(_ route: AppShortcutRoute) -> Bool {
+        guard tabBarController != nil else { return false }
         switch route {
+        case .analytics:
+            guard selectTab(.analytics) else { return false }
+            analyticsNavController?.popToRootViewController(animated: false)
+        case .products:
+            guard selectTab(.products) else { return false }
+            productsNavController?.popToRootViewController(animated: false)
         case .quickSale:
-            guard selectTab(.sales) else { return }
+            guard selectTab(.sales) else { return false }
             quickNavController?.popToRootViewController(animated: false)
         case .notifications:
-            guard selectTab(.notifications) else { return }
+            guard selectTab(.notifications) else { return false }
             notificationsNavController?.popToRootViewController(animated: false)
         case .myEnterprise:
             guard UserSessionManager.shared.currentRole.canViewEnterprise,
-                  selectTab(.profile) else { return }
-            guard let profileNavController else { return }
+                  selectTab(.profile) else { return false }
+            guard let profileNavController else { return false }
             profileNavController.popToRootViewController(animated: false)
-            let enterpriseVC = UIHostingController(rootView: MyEnterpriseScreen(viewModel: .mock()))
+            let enterpriseVC = UIHostingController(rootView: MyEnterpriseScreen(viewModel: .backend()))
             profileNavController.pushViewController(enterpriseVC, animated: false)
         }
+
+        return true
     }
 
     private func makeAllowedViewControllers() -> [UIViewController] {

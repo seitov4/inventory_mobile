@@ -131,6 +131,7 @@
 "auth.app_subtitle_alt" = "Система учета товаров";
 "auth.sign_in_biometrics" = "Войти с Face ID / Touch ID";
 "auth.invalid_credentials" = "Неверный логин или пароль";
+"auth.forbidden" = "Недостаточно прав для этого действия";
 "auth.user_not_found" = "Пользователь не найден";
 "auth.server_unavailable" = "Сервер временно недоступен";
 "auth.decoding_error" = "Ошибка обработки данных";
@@ -330,3 +331,15 @@
 "analytics.stock.days_left" = "Дней";
 "analytics.stock.reorder" = "Докупить";
 "analytics.stock.cost" = "Сумма";
+"products.category_uncategorized" = "Без категории";
+"analytics.subtitle.sales_days" = "Дней с продажами";
+"analytics.subtitle.per_day" = "В среднем за день";
+"analytics.subtitle.days_in_period" = "Дней в периоде";
+"enterprise.address_unavailable" = "Адрес не указан";
+"enterprise.tax_id_unavailable" = "БИН не указан";
+"sales.no_warehouse" = "Склад не найден";
+"error.network_offline" = "Нет подключения к интернету";
+"error.network_timeout" = "Сервер не отвечает. Попробуйте позже";
+"error.network_ssl" = "Не удалось установить защищённое соединение";
+"error.network_generic" = "Ошибка сети. Проверьте подключение";
+"error.invalid_url" = "Некорректный адрес сервера";

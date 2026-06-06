@@ -9,13 +9,97 @@
 /* Begin PBXBuildFile section */
 		D95940142EBAA36E0026E3F9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D95940132EBAA36E0026E3F9 /* SnapKit */; };
 		D9A4CD502EE86E7000233FA3 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = D9A4CD4F2EE86E7000233FA3 /* KeychainAccess */; };
+		D9C1000C2F1000010026E3F9 /* InventiXControlsExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D9C100012F1000010026E3F9 /* InventiXControlsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D9C2000B2F1000020026E3F9 /* InventiXProductsControlExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D9C200012F1000020026E3F9 /* InventiXProductsControlExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D9C3000B2F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D9C300012F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D9C4000B2F1000040026E3F9 /* InventiXNotificationsControlExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D9C400012F1000040026E3F9 /* InventiXNotificationsControlExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D9C1000E2F1000010026E3F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9593FEF2EBA9FF80026E3F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9C100042F1000010026E3F9;
+			remoteInfo = InventiXControlsExtension;
+		};
+		D9C2000D2F1000020026E3F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9593FEF2EBA9FF80026E3F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9C200042F1000020026E3F9;
+			remoteInfo = InventiXProductsControlExtension;
+		};
+		D9C3000D2F1000030026E3F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9593FEF2EBA9FF80026E3F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9C300042F1000030026E3F9;
+			remoteInfo = InventiXAnalyticsControlExtension;
+		};
+		D9C4000D2F1000040026E3F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9593FEF2EBA9FF80026E3F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9C400042F1000040026E3F9;
+			remoteInfo = InventiXNotificationsControlExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D9C1000B2F1000010026E3F9 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D9C1000C2F1000010026E3F9 /* InventiXControlsExtension.appex in Embed App Extensions */,
+				D9C2000B2F1000020026E3F9 /* InventiXProductsControlExtension.appex in Embed App Extensions */,
+				D9C3000B2F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex in Embed App Extensions */,
+				D9C4000B2F1000040026E3F9 /* InventiXNotificationsControlExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D9593FF72EBA9FF80026E3F9 /* UIKitPractice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitPractice.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9C100012F1000010026E3F9 /* InventiXControlsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InventiXControlsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9C200012F1000020026E3F9 /* InventiXProductsControlExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InventiXProductsControlExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9C300012F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InventiXAnalyticsControlExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9C400012F1000040026E3F9 /* InventiXNotificationsControlExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InventiXNotificationsControlExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D9C100032F1000010026E3F9 /* Exceptions for "InventiXControlsExtension" folder in "InventiXControlsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D9C100042F1000010026E3F9 /* InventiXControlsExtension */;
+		};
+		D9C200032F1000020026E3F9 /* Exceptions for "InventiXProductsControlExtension" folder in "InventiXProductsControlExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D9C200042F1000020026E3F9 /* InventiXProductsControlExtension */;
+		};
+		D9C300032F1000030026E3F9 /* Exceptions for "InventiXAnalyticsControlExtension" folder in "InventiXAnalyticsControlExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D9C300042F1000030026E3F9 /* InventiXAnalyticsControlExtension */;
+		};
+		D9C400032F1000040026E3F9 /* Exceptions for "InventiXNotificationsControlExtension" folder in "InventiXNotificationsControlExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D9C400042F1000040026E3F9 /* InventiXNotificationsControlExtension */;
+		};
 		D9F0A1122F0000020026E3F9 /* Exceptions for "UIKitPractice" folder in "UIKitPractice" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -34,6 +118,38 @@
 			path = UIKitPractice;
 			sourceTree = "<group>";
 		};
+		D9C100022F1000010026E3F9 /* InventiXControlsExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D9C100032F1000010026E3F9 /* Exceptions for "InventiXControlsExtension" folder in "InventiXControlsExtension" target */,
+			);
+			path = InventiXControlsExtension;
+			sourceTree = "<group>";
+		};
+		D9C200022F1000020026E3F9 /* InventiXProductsControlExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D9C200032F1000020026E3F9 /* Exceptions for "InventiXProductsControlExtension" folder in "InventiXProductsControlExtension" target */,
+			);
+			path = InventiXProductsControlExtension;
+			sourceTree = "<group>";
+		};
+		D9C300022F1000030026E3F9 /* InventiXAnalyticsControlExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D9C300032F1000030026E3F9 /* Exceptions for "InventiXAnalyticsControlExtension" folder in "InventiXAnalyticsControlExtension" target */,
+			);
+			path = InventiXAnalyticsControlExtension;
+			sourceTree = "<group>";
+		};
+		D9C400022F1000040026E3F9 /* InventiXNotificationsControlExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D9C400032F1000040026E3F9 /* Exceptions for "InventiXNotificationsControlExtension" folder in "InventiXNotificationsControlExtension" target */,
+			);
+			path = InventiXNotificationsControlExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +162,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D9C100062F1000010026E3F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C200062F1000020026E3F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C300062F1000030026E3F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C400062F1000040026E3F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -53,6 +197,10 @@
 			isa = PBXGroup;
 			children = (
 				D9593FF92EBA9FF80026E3F9 /* UIKitPractice */,
+				D9C100022F1000010026E3F9 /* InventiXControlsExtension */,
+				D9C200022F1000020026E3F9 /* InventiXProductsControlExtension */,
+				D9C300022F1000030026E3F9 /* InventiXAnalyticsControlExtension */,
+				D9C400022F1000040026E3F9 /* InventiXNotificationsControlExtension */,
 				D9593FF82EBA9FF80026E3F9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +209,10 @@
 			isa = PBXGroup;
 			children = (
 				D9593FF72EBA9FF80026E3F9 /* UIKitPractice.app */,
+				D9C100012F1000010026E3F9 /* InventiXControlsExtension.appex */,
+				D9C200012F1000020026E3F9 /* InventiXProductsControlExtension.appex */,
+				D9C300012F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex */,
+				D9C400012F1000040026E3F9 /* InventiXNotificationsControlExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,10 +227,15 @@
 				D9593FF32EBA9FF80026E3F9 /* Sources */,
 				D9593FF42EBA9FF80026E3F9 /* Frameworks */,
 				D9593FF52EBA9FF80026E3F9 /* Resources */,
+				D9C1000B2F1000010026E3F9 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D9C1000D2F1000010026E3F9 /* PBXTargetDependency */,
+				D9C2000C2F1000020026E3F9 /* PBXTargetDependency */,
+				D9C3000C2F1000030026E3F9 /* PBXTargetDependency */,
+				D9C4000C2F1000040026E3F9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D9593FF92EBA9FF80026E3F9 /* UIKitPractice */,
@@ -92,6 +249,94 @@
 			productReference = D9593FF72EBA9FF80026E3F9 /* UIKitPractice.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D9C100042F1000010026E3F9 /* InventiXControlsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9C100082F1000010026E3F9 /* Build configuration list for PBXNativeTarget "InventiXControlsExtension" */;
+			buildPhases = (
+				D9C100052F1000010026E3F9 /* Sources */,
+				D9C100062F1000010026E3F9 /* Frameworks */,
+				D9C100072F1000010026E3F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D9C100022F1000010026E3F9 /* InventiXControlsExtension */,
+			);
+			name = InventiXControlsExtension;
+			packageProductDependencies = (
+			);
+			productName = InventiXControlsExtension;
+			productReference = D9C100012F1000010026E3F9 /* InventiXControlsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D9C200042F1000020026E3F9 /* InventiXProductsControlExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9C200082F1000020026E3F9 /* Build configuration list for PBXNativeTarget "InventiXProductsControlExtension" */;
+			buildPhases = (
+				D9C200052F1000020026E3F9 /* Sources */,
+				D9C200062F1000020026E3F9 /* Frameworks */,
+				D9C200072F1000020026E3F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D9C200022F1000020026E3F9 /* InventiXProductsControlExtension */,
+			);
+			name = InventiXProductsControlExtension;
+			packageProductDependencies = (
+			);
+			productName = InventiXProductsControlExtension;
+			productReference = D9C200012F1000020026E3F9 /* InventiXProductsControlExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D9C300042F1000030026E3F9 /* InventiXAnalyticsControlExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9C300082F1000030026E3F9 /* Build configuration list for PBXNativeTarget "InventiXAnalyticsControlExtension" */;
+			buildPhases = (
+				D9C300052F1000030026E3F9 /* Sources */,
+				D9C300062F1000030026E3F9 /* Frameworks */,
+				D9C300072F1000030026E3F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D9C300022F1000030026E3F9 /* InventiXAnalyticsControlExtension */,
+			);
+			name = InventiXAnalyticsControlExtension;
+			packageProductDependencies = (
+			);
+			productName = InventiXAnalyticsControlExtension;
+			productReference = D9C300012F1000030026E3F9 /* InventiXAnalyticsControlExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D9C400042F1000040026E3F9 /* InventiXNotificationsControlExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9C400082F1000040026E3F9 /* Build configuration list for PBXNativeTarget "InventiXNotificationsControlExtension" */;
+			buildPhases = (
+				D9C400052F1000040026E3F9 /* Sources */,
+				D9C400062F1000040026E3F9 /* Frameworks */,
+				D9C400072F1000040026E3F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D9C400022F1000040026E3F9 /* InventiXNotificationsControlExtension */,
+			);
+			name = InventiXNotificationsControlExtension;
+			packageProductDependencies = (
+			);
+			productName = InventiXNotificationsControlExtension;
+			productReference = D9C400012F1000040026E3F9 /* InventiXNotificationsControlExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -103,6 +348,18 @@
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					D9593FF62EBA9FF80026E3F9 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					D9C100042F1000010026E3F9 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					D9C200042F1000020026E3F9 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					D9C300042F1000030026E3F9 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					D9C400042F1000040026E3F9 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -128,12 +385,44 @@
 			projectRoot = "";
 			targets = (
 				D9593FF62EBA9FF80026E3F9 /* UIKitPractice */,
+				D9C100042F1000010026E3F9 /* InventiXControlsExtension */,
+				D9C200042F1000020026E3F9 /* InventiXProductsControlExtension */,
+				D9C300042F1000030026E3F9 /* InventiXAnalyticsControlExtension */,
+				D9C400042F1000040026E3F9 /* InventiXNotificationsControlExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D9593FF52EBA9FF80026E3F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C100072F1000010026E3F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C200072F1000020026E3F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C300072F1000030026E3F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C400072F1000040026E3F9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -150,7 +439,58 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D9C100052F1000010026E3F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C200052F1000020026E3F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C300052F1000030026E3F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9C400052F1000040026E3F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D9C1000D2F1000010026E3F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9C100042F1000010026E3F9 /* InventiXControlsExtension */;
+			targetProxy = D9C1000E2F1000010026E3F9 /* PBXContainerItemProxy */;
+		};
+		D9C2000C2F1000020026E3F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9C200042F1000020026E3F9 /* InventiXProductsControlExtension */;
+			targetProxy = D9C2000D2F1000020026E3F9 /* PBXContainerItemProxy */;
+		};
+		D9C3000C2F1000030026E3F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9C300042F1000030026E3F9 /* InventiXAnalyticsControlExtension */;
+			targetProxy = D9C3000D2F1000030026E3F9 /* PBXContainerItemProxy */;
+		};
+		D9C4000C2F1000040026E3F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9C400042F1000040026E3F9 /* InventiXNotificationsControlExtension */;
+			targetProxy = D9C4000D2F1000040026E3F9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D959400E2EBA9FFA0026E3F9 /* Debug */ = {
@@ -159,6 +499,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = UIKitPractice/UIKitPractice.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MV859P276L;
@@ -192,6 +533,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = UIKitPractice/UIKitPractice.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MV859P276L;
@@ -342,6 +684,246 @@
 			};
 			name = Release;
 		};
+		D9C100092F1000010026E3F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXControlsExtension/InventiXControlsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXControlsExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.Controls;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D9C1000A2F1000010026E3F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXControlsExtension/InventiXControlsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXControlsExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.Controls;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D9C200092F1000020026E3F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXProductsControlExtension/InventiXProductsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXProductsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.ProductsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D9C2000A2F1000020026E3F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXProductsControlExtension/InventiXProductsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXProductsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.ProductsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D9C300092F1000030026E3F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXAnalyticsControlExtension/InventiXAnalyticsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXAnalyticsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.AnalyticsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D9C3000A2F1000030026E3F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXAnalyticsControlExtension/InventiXAnalyticsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXAnalyticsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.AnalyticsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D9C400092F1000040026E3F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXNotificationsControlExtension/InventiXNotificationsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXNotificationsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.NotificationsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D9C4000A2F1000040026E3F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = InventiXNotificationsControlExtension/InventiXNotificationsControlExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MV859P276L;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = InventiXNotificationsControlExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Nurseit.UIKitPractice.NotificationsControl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -359,6 +941,42 @@
 			buildConfigurations = (
 				D959400E2EBA9FFA0026E3F9 /* Debug */,
 				D959400F2EBA9FFA0026E3F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9C100082F1000010026E3F9 /* Build configuration list for PBXNativeTarget "InventiXControlsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9C100092F1000010026E3F9 /* Debug */,
+				D9C1000A2F1000010026E3F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9C200082F1000020026E3F9 /* Build configuration list for PBXNativeTarget "InventiXProductsControlExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9C200092F1000020026E3F9 /* Debug */,
+				D9C2000A2F1000020026E3F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9C300082F1000030026E3F9 /* Build configuration list for PBXNativeTarget "InventiXAnalyticsControlExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9C300092F1000030026E3F9 /* Debug */,
+				D9C3000A2F1000030026E3F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9C400082F1000040026E3F9 /* Build configuration list for PBXNativeTarget "InventiXNotificationsControlExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9C400092F1000040026E3F9 /* Debug */,
+				D9C4000A2F1000040026E3F9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

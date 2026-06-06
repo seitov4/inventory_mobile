@@ -14,6 +14,7 @@ final class ProfileScreenViewModel: ObservableObject {
     @Published var currentRole: AppUserRole
 
     private let avatarStore: ProfileAvatarStoring
+    private let authService: AuthService
     private let sessionManager: UserSessionManager
     private var languageObserver: NSObjectProtocol?
     private var roleObserver: NSObjectProtocol?
@@ -25,16 +26,18 @@ final class ProfileScreenViewModel: ObservableObject {
         position: String = L10n.tr("profile.default_position"),
         enterpriseViewModel: MyEnterpriseViewModel? = nil,
         avatarStore: ProfileAvatarStoring? = nil,
+        authService: AuthService = .shared,
         sessionManager: UserSessionManager = .shared
     ) {
         self.sessionManager = sessionManager
+        self.authService = authService
         self.fullName = fullName
         self.email = email
         self.phone = phone
         self.currentRole = sessionManager.currentRole
         self.role = sessionManager.currentRole.displayName
         self.position = position
-        self.enterpriseViewModel = enterpriseViewModel ?? MyEnterpriseViewModel.mock()
+        self.enterpriseViewModel = enterpriseViewModel ?? MyEnterpriseViewModel.backend()
         let avatarStore = avatarStore ?? ProfileAvatarStore.shared
         self.avatarStore = avatarStore
         self.avatarImage = avatarStore.loadAvatar()
@@ -52,6 +55,7 @@ final class ProfileScreenViewModel: ObservableObject {
         ) { [weak self] notification in
             self?.applyRole(notification.object as? AppUserRole)
         }
+        loadBackendProfile()
     }
 
     deinit {
@@ -103,6 +107,31 @@ final class ProfileScreenViewModel: ObservableObject {
     private func applyRole(_ role: AppUserRole?) {
         currentRole = role ?? sessionManager.currentRole
         self.role = currentRole.displayName
+    }
+
+    private func loadBackendProfile() {
+        authService.getCurrentUser { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let user):
+                    let name = [user.first_name, user.last_name]
+                        .compactMap { $0 }
+                        .filter { !$0.isEmpty }
+                        .joined(separator: " ")
+                    if !name.isEmpty {
+                        self.fullName = name
+                    }
+                    self.email = user.email ?? ""
+                    self.phone = user.phone ?? ""
+                    self.position = user.store_name ?? self.position
+                    self.sessionManager.updateRole(fromBackend: user.role)
+                    self.applyRole(nil)
+                case .failure:
+                    break
+                }
+            }
+        }
     }
 }
 

@@ -53,6 +53,9 @@ private struct LoginRequest: Encodable {
 }
 
 final class AuthService {
+    static let shared = AuthService()
+
+    init() {}
 
     func login(
         login: String,
@@ -65,7 +68,10 @@ final class AuthService {
             email: type == .email ? login : nil,
             password: password
         )
-        let data = try? JSONEncoder().encode(request)
+        guard let data = try? JSONEncoder().encode(request) else {
+            completion(.failure(AppError.unknown))
+            return
+        }
 
         APIClient.shared.requestEnvelope(
             endpoint: "auth/login",
@@ -82,4 +88,28 @@ final class AuthService {
             }
         }
     }
+
+    func logout() {
+        KeychainManager.shared.deleteToken()
+        UserSessionManager.shared.clear()
+    }
+
+    func getCurrentUser(completion: @escaping (Result<User, Error>) -> Void) {
+        APIClient.shared.requestEnvelope(
+            endpoint: "auth/me",
+            method: "GET"
+        ) { (result: Result<MePayload, Error>) in
+            switch result {
+            case .success(let payload):
+                UserSessionManager.shared.updateRole(fromBackend: payload.user.role)
+                completion(.success(payload.user))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+}
+
+private struct MePayload: Decodable {
+    let user: User
 }

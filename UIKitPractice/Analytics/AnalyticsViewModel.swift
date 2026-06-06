@@ -19,10 +19,15 @@ final class AnalyticsViewModel {
     private(set) var inventoryInsight: InventoryHealthInsight = .empty
 
     private let productsService: ProductsServiceProtocol
+    private let salesService: SalesService
     private var languageObserver: NSObjectProtocol?
 
-    init(productsService: ProductsServiceProtocol = MockProductsService()) {
+    init(
+        productsService: ProductsServiceProtocol = ProductsService(),
+        salesService: SalesService = .shared
+    ) {
         self.productsService = productsService
+        self.salesService = salesService
         refresh()
         languageObserver = NotificationCenter.default.addObserver(
             forName: .appLanguageDidChange,
@@ -41,9 +46,33 @@ final class AnalyticsViewModel {
 
     func refresh() {
         metrics = Self.makeMetrics(for: period)
-        dailySales = Self.makeDailySales(for: period)
-        categories = Self.makeCategories(for: period)
+        dailySales = []
+        categories = []
+        loadSalesAnalytics()
         loadInventoryInsight()
+    }
+
+    private func loadSalesAnalytics() {
+        salesService.fetchPeriodSales(period: period) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let points):
+                    let sales = points.enumerated().map { index, point in
+                        AnalyticsDaySale(
+                            weekday: Self.displayLabel(for: point.date, fallbackIndex: index),
+                            amount: point.total,
+                            id: point.date
+                        )
+                    }
+                    self.dailySales = sales
+                    self.metrics = Self.makeMetrics(from: sales, period: self.period)
+                case .failure:
+                    self.dailySales = Self.makeDailySales(for: self.period)
+                    self.metrics = Self.makeMetrics(for: self.period)
+                }
+            }
+        }
     }
 
     private func loadInventoryInsight() {
@@ -56,11 +85,84 @@ final class AnalyticsViewModel {
                         products: response.products,
                         period: self.period
                     )
+                    self.categories = Self.makeInventoryCategories(products: response.products)
                 case .failure:
                     self.inventoryInsight = .empty
                 }
             }
         }
+    }
+
+    private static func makeMetrics(from sales: [AnalyticsDaySale], period: AnalyticsPeriodKind) -> [AnalyticsMetric] {
+        let revenue = sales.reduce(0) { $0 + $1.amount }
+        let activeDays = sales.filter { $0.amount > 0 }.count
+        let avgPerDay = activeDays == 0 ? 0 : revenue / Double(activeDays)
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.groupingSeparator = " "
+        nf.maximumFractionDigits = 0
+
+        let cf = AppCurrency.formatter
+
+        return [
+            AnalyticsMetric(
+                title: L10n.tr("analytics.metric.revenue"),
+                value: cf.string(from: NSNumber(value: revenue)) ?? "—",
+                subtitle: L10n.tr("analytics.subtitle.period"),
+                systemImage: "tengesign.circle.fill",
+                tintHex: 0x1C7AF5
+            ),
+            AnalyticsMetric(
+                title: L10n.tr("analytics.metric.orders"),
+                value: nf.string(from: NSNumber(value: activeDays)) ?? "—",
+                subtitle: L10n.tr("analytics.subtitle.sales_days"),
+                systemImage: "calendar.badge.checkmark",
+                tintHex: 0x6FCF97
+            ),
+            AnalyticsMetric(
+                title: L10n.tr("analytics.metric.avg_check"),
+                value: cf.string(from: NSNumber(value: avgPerDay)) ?? "—",
+                subtitle: L10n.tr("analytics.subtitle.per_day"),
+                systemImage: "chart.bar.doc.horizontal.fill",
+                tintHex: 0xF2994A
+            ),
+            AnalyticsMetric(
+                title: L10n.tr("analytics.metric.conversion"),
+                value: "\(period.dayCount)",
+                subtitle: L10n.tr("analytics.subtitle.days_in_period"),
+                systemImage: "clock.arrow.circlepath",
+                tintHex: 0x9B51E0
+            )
+        ]
+    }
+
+    private static func displayLabel(for dateString: String, fallbackIndex: Int) -> String {
+        let input = DateFormatter()
+        input.dateFormat = "yyyy-MM-dd"
+        guard let date = input.date(from: dateString) else { return "\(fallbackIndex + 1)" }
+
+        let output = DateFormatter()
+        output.locale = Locale(identifier: LocalizationManager.shared.currentLanguage.localeIdentifier)
+        output.dateFormat = "dd.MM"
+        return output.string(from: date)
+    }
+
+    private static func makeInventoryCategories(products: [Product]) -> [AnalyticsCategoryRow] {
+        let grouped = Dictionary(grouping: products) { $0.category }
+        let totals = grouped.mapValues { products in
+            products.reduce(0) { $0 + ($1.price * Double($1.quantity)) }
+        }
+        let grandTotal = max(totals.values.reduce(0, +), 1)
+        return totals
+            .sorted { $0.value > $1.value }
+            .prefix(5)
+            .map { name, value in
+                AnalyticsCategoryRow(
+                    name: name,
+                    share: value / grandTotal,
+                    revenueFormatted: AppCurrency.string(from: value)
+                )
+            }
     }
 
     private static func makeMetrics(for period: AnalyticsPeriodKind) -> [AnalyticsMetric] {

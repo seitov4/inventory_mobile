@@ -131,6 +131,7 @@
 "auth.app_subtitle_alt" = "Inventory management system";
 "auth.sign_in_biometrics" = "Sign in with Face ID / Touch ID";
 "auth.invalid_credentials" = "Invalid login or password";
+"auth.forbidden" = "You do not have permission for this action";
 "auth.user_not_found" = "User not found";
 "auth.server_unavailable" = "Server is temporarily unavailable";
 "auth.decoding_error" = "Data processing error";
@@ -330,3 +331,15 @@
 "analytics.stock.days_left" = "Days";
 "analytics.stock.reorder" = "Reorder";
 "analytics.stock.cost" = "Cost";
+"products.category_uncategorized" = "Uncategorized";
+"analytics.subtitle.sales_days" = "Days with sales";
+"analytics.subtitle.per_day" = "Average per day";
+"analytics.subtitle.days_in_period" = "Days in period";
+"enterprise.address_unavailable" = "Address not provided";
+"enterprise.tax_id_unavailable" = "Tax ID not provided";
+"sales.no_warehouse" = "Warehouse not found";
+"error.network_offline" = "No internet connection";
+"error.network_timeout" = "The server is not responding. Try again later";
+"error.network_ssl" = "Could not establish a secure connection";
+"error.network_generic" = "Network error. Check your connection";
+"error.invalid_url" = "Invalid server address";

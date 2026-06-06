@@ -108,6 +108,13 @@ final class UserSessionManager {
             return role
         }
         set {
+            guard Thread.isMainThread else {
+                DispatchQueue.main.async { [weak self] in
+                    self?.currentRole = newValue
+                }
+                return
+            }
+
             UserDefaults.standard.set(newValue.rawValue, forKey: roleKey)
             NotificationCenter.default.post(name: .appUserRoleDidChange, object: newValue)
         }

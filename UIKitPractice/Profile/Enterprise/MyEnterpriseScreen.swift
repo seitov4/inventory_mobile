@@ -21,11 +21,17 @@ struct Employee: Identifiable {
 final class MyEnterpriseViewModel: ObservableObject {
     @Published var enterprise: EnterpriseInfo
     @Published var employees: [Employee]
+    private let service: EnterpriseService
     private var languageObserver: NSObjectProtocol?
 
-    init(enterprise: EnterpriseInfo, employees: [Employee]) {
+    init(
+        enterprise: EnterpriseInfo,
+        employees: [Employee],
+        service: EnterpriseService = .shared
+    ) {
         self.enterprise = enterprise
         self.employees = employees
+        self.service = service
         languageObserver = NotificationCenter.default.addObserver(
             forName: .appLanguageDidChange,
             object: nil,
@@ -57,6 +63,27 @@ final class MyEnterpriseViewModel: ObservableObject {
                 .init(id: 4, fullName: "Timur Abdrakhmanov", role: L10n.tr("enterprise.employee.admin"), phone: "+7 707 987 65 43", isActive: true)
             ]
         )
+    }
+
+    static func backend() -> MyEnterpriseViewModel {
+        let viewModel = MyEnterpriseViewModel.mock()
+        viewModel.load()
+        return viewModel
+    }
+
+    func load() {
+        service.fetchEnterprise { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let payload):
+                    self.enterprise = payload.0
+                    self.employees = payload.1
+                case .failure:
+                    break
+                }
+            }
+        }
     }
 
     private func localizeMockEmployeeRoles() {

@@ -19,7 +19,7 @@ final class QuickSaleCoordinator: Coordinator {
 
     func start() {
         nav.navigationBar.prefersLargeTitles = true
-        let viewModel = QuickSaleViewModel()
+        let viewModel = QuickSaleViewModel(productsService: ProductsService())
         let vc = QuickSaleViewController(viewModel: viewModel)
         nav.setViewControllers([vc], animated: false)
     }

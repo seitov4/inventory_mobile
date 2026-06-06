@@ -23,7 +23,7 @@ final class LoginScreenViewModel: ObservableObject {
 
     init(
         authService: AuthService? = nil,
-        isMockLoginEnabled: Bool = true,
+        isMockLoginEnabled: Bool = AppConfig.isMockLoginEnabled,
         localizationManager: LocalizationManager? = nil
     ) {
         self.authService = authService ?? AuthService()
@@ -202,6 +202,9 @@ struct LoginScreen: View {
                         }
                     }
                     .textContentType(.password)
+                    .keyboardType(.asciiCapable)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                     .focused($focus, equals: .password)
                     .submitLabel(.go)
                     .onSubmit { viewModel.login(onSuccess: onLoginSuccess) }

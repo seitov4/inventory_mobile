@@ -10,10 +10,13 @@ import Observation
 final class NotificationsViewModel {
 
     var items: [StoreNotificationItem]
+    private let service: NotificationsService
     private var languageObserver: NSObjectProtocol?
 
-    init() {
-        items = Self.makeMock()
+    init(service: NotificationsService = .shared) {
+        self.service = service
+        items = []
+        loadNotifications()
         languageObserver = NotificationCenter.default.addObserver(
             forName: .appLanguageDidChange,
             object: nil,
@@ -30,10 +33,14 @@ final class NotificationsViewModel {
     }
 
     func markAllRead() {
+        let unreadIDs = items.filter(\.isUnread).map(\.id)
         items = items.map { row in
             var r = row
             r.isUnread = false
             return r
+        }
+        unreadIDs.forEach { id in
+            service.markRead(id: id) { _ in }
         }
         AppAnalytics.shared.track(.notificationsMarkedAllRead, properties: [
             "count": .int(items.count)
@@ -45,6 +52,7 @@ final class NotificationsViewModel {
         var copy = items[i]
         copy.isUnread = false
         items[i] = copy
+        service.markRead(id: item.id) { _ in }
         AppAnalytics.shared.track(.notificationOpened, properties: [
             "notification_id": .string(item.id),
             "bucket": .string(item.bucket.analyticsValue),
@@ -58,10 +66,34 @@ final class NotificationsViewModel {
 
     private func reloadLocalizedItems() {
         let unreadByID = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0.isUnread) })
-        items = Self.makeMock().map { item in
-            var copy = item
-            copy.isUnread = unreadByID[item.id] ?? item.isUnread
-            return copy
+        service.fetchNotifications { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let items):
+                    self.items = items.map { item in
+                        var copy = item
+                        copy.isUnread = unreadByID[item.id] ?? item.isUnread
+                        return copy
+                    }
+                case .failure:
+                    break
+                }
+            }
+        }
+    }
+
+    private func loadNotifications() {
+        service.fetchNotifications { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let items):
+                    self.items = items
+                case .failure:
+                    self.items = []
+                }
+            }
         }
     }
 

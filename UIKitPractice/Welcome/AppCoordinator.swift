@@ -103,9 +103,8 @@ final class AppCoordinator: Coordinator {
         mainCoordinator = main
         childCoordinators = [main]
         main.start()
-        if let route = AppShortcutRouter.shared.pendingRoute {
-            main.openShortcut(route)
-            AppShortcutRouter.shared.pendingRoute = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.openPendingShortcutIfPossible()
         }
     }
 
@@ -131,8 +130,18 @@ final class AppCoordinator: Coordinator {
     private func handleShortcutNotification(_ notification: Notification) {
         guard let route = notification.object as? AppShortcutRoute else { return }
         if let mainCoordinator {
-            mainCoordinator.openShortcut(route)
-            AppShortcutRouter.shared.pendingRoute = nil
+            AppShortcutRouter.shared.enqueue(route)
+            openPendingShortcutIfPossible()
+        }
+    }
+
+    private func openPendingShortcutIfPossible() {
+        AppShortcutRouter.shared.reloadPersistedRouteIfNeeded()
+        guard let route = AppShortcutRouter.shared.pendingRoute,
+              let mainCoordinator else { return }
+
+        if mainCoordinator.openShortcut(route) {
+            AppShortcutRouter.shared.markHandled(route)
         }
     }
 }

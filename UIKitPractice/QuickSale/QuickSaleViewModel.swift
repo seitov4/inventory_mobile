@@ -16,6 +16,7 @@ final class QuickSaleViewModel {
     var checkoutRoute: SalesCheckoutRoute?
 
     private let productsService: ProductsServiceProtocol
+    private let salesService: SalesService
     private var productsByBarcode: [String: Product] = [:]
     private var lastScanByBarcode: [String: Date] = [:]
     private let debounceInterval: TimeInterval = 1.5
@@ -47,8 +48,12 @@ final class QuickSaleViewModel {
         productsByBarcode.values.sorted { $0.id < $1.id }
     }
 
-    init(productsService: ProductsServiceProtocol = MockProductsService()) {
+    init(
+        productsService: ProductsServiceProtocol = ProductsService(),
+        salesService: SalesService = .shared
+    ) {
         self.productsService = productsService
+        self.salesService = salesService
         seedLocalCatalog()
         refreshCatalog()
         languageObserver = NotificationCenter.default.addObserver(
@@ -161,9 +166,27 @@ final class QuickSaleViewModel {
     }
 
     private func finalizeSale() {
-        AppAnalytics.shared.track(.saleCompleted, properties: saleAnalyticsProperties())
-        clearCart()
-        showToast(L10n.tr("sales.completed"), style: .success)
+        let items = cartItems
+        salesService.createSale(cartItems: items) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let sale):
+                    var properties = self.saleAnalyticsProperties()
+                    properties["sale_id"] = .int(sale.saleID)
+                    AppAnalytics.shared.track(.saleCompleted, properties: properties)
+                    self.clearCart()
+                    self.refreshCatalog()
+                    self.showToast(L10n.tr("sales.completed"), style: .success)
+                case .failure(let error):
+                    AppAnalytics.shared.track(.barcodeScanFailed, properties: [
+                        "reason": "sale_create_failed",
+                        "message": .string(error.localizedDescription)
+                    ])
+                    self.showToast(error.localizedDescription, style: .destructive)
+                }
+            }
+        }
     }
 
     private func add(_ product: Product, bypassDebounce: Bool = false, source: AddSource = .manual) {
@@ -275,7 +298,6 @@ final class QuickSaleViewModel {
     }
 
     private func refreshCatalog() {
-        // TODO: Connect to API
         productsService.fetchProducts(category: nil, searchQuery: nil) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }

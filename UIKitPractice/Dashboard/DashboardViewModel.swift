@@ -10,15 +10,26 @@ import Foundation
 final class DashboardViewModel{
     
     private(set) var todaySales: Double = 0.0
+    private let salesService: SalesService
     
     var onUpdate: (() -> Void)?
+    var onError: ((String) -> Void)?
+
+    init(salesService: SalesService = .shared) {
+        self.salesService = salesService
+    }
     
     func loadData() {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self = self else { return }
-            self.todaySales = 1233.32
-            DispatchQueue.main.async{
-                self.onUpdate?()
+        salesService.fetchDailySales { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let payload):
+                    self.todaySales = payload.revenue
+                    self.onUpdate?()
+                case .failure(let error):
+                    self.onError?(error.localizedDescription)
+                }
             }
         }
     }
