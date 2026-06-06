@@ -79,17 +79,33 @@ final class QuickSaleViewModel {
             return
         }
 
-        guard let product = productsByBarcode[barcode] else {
-            playFailedScanSound()
-            AppAnalytics.shared.track(.barcodeScanFailed, properties: [
-                "barcode": .string(barcode),
-                "reason": "not_found"
-            ])
-            showToast(L10n.format("sales.product_not_found_format", barcode), style: .destructive)
-            return
-        }
+        productsService.fetchProduct(barcode: barcode) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
 
-        add(product, source: .barcodeScan)
+                switch result {
+                case .success(let product):
+                    if let barcode = product.barcode, !barcode.isEmpty {
+                        self.productsByBarcode[barcode] = product
+                    }
+                    self.add(product, source: .barcodeScan)
+
+                case .failure(let error):
+                    self.playFailedScanSound()
+                    AppAnalytics.shared.track(.barcodeScanFailed, properties: [
+                        "barcode": .string(barcode),
+                        "reason": "lookup_failed",
+                        "message": .string(error.localizedDescription)
+                    ])
+
+                    if case .notFound = AppError.map(error) {
+                        self.showToast(L10n.format("sales.product_not_found_format", barcode), style: .destructive)
+                    } else {
+                        self.showToast(error.localizedDescription, style: .destructive)
+                    }
+                }
+            }
+        }
     }
 
     func mockScan(_ product: Product) {

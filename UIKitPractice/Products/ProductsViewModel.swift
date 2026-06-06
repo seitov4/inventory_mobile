@@ -13,6 +13,11 @@ protocol ProductsServiceProtocol {
         searchQuery: String?,
         completion: @escaping (Result<ProductsResponse, Error>) -> Void
     )
+
+    func fetchProduct(
+        barcode: String,
+        completion: @escaping (Result<Product, Error>) -> Void
+    )
 }
 
 extension ProductsService: ProductsServiceProtocol {}

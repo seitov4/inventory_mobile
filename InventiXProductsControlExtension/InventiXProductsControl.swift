@@ -96,20 +96,51 @@ private struct ProductsWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        if family == .accessoryCircular {
-            Image(systemName: "shippingbox.fill")
-                .widgetLabel("Товары")
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: "shippingbox.fill")
-                    .font(.title2.weight(.semibold))
-                Text("Товары")
-                    .font(.headline)
-                Text("Открыть каталог")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .containerBackground(.fill.tertiary, for: .widget)
+        switch family {
+        case .accessoryCircular:
+            circularLayout
+        case .accessoryRectangular:
+            rectangularLayout
+        default:
+            systemSmallLayout
         }
+    }
+
+    private var circularLayout: some View {
+        Image(systemName: "shippingbox.fill")
+            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .widgetAccentable()
+            .widgetLabel("Товары")
+    }
+
+    private var rectangularLayout: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "shippingbox.fill")
+                .font(.system(.caption, design: .rounded).weight(.semibold))
+                .widgetAccentable()
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Товары")
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .widgetAccentable()
+                    .lineLimit(1)
+                Text("Открыть каталог")
+                    .font(.system(.caption2, design: .rounded))
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var systemSmallLayout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "shippingbox.fill")
+                .font(.title2.weight(.semibold))
+            Text("Товары")
+                .font(.headline)
+            Text("Открыть каталог")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }

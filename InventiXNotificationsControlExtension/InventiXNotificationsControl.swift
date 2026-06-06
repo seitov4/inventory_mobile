@@ -96,20 +96,51 @@ private struct NotificationsWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        if family == .accessoryCircular {
-            Image(systemName: "bell.badge.fill")
-                .widgetLabel("Уведомления")
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: "bell.badge.fill")
-                    .font(.title2.weight(.semibold))
-                Text("Уведомления")
-                    .font(.headline)
-                Text("Открыть центр")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .containerBackground(.fill.tertiary, for: .widget)
+        switch family {
+        case .accessoryCircular:
+            circularLayout
+        case .accessoryRectangular:
+            rectangularLayout
+        default:
+            systemSmallLayout
         }
+    }
+
+    private var circularLayout: some View {
+        Image(systemName: "bell.badge.fill")
+            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .widgetAccentable()
+            .widgetLabel("Уведомления")
+    }
+
+    private var rectangularLayout: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "bell.badge.fill")
+                .font(.system(.caption, design: .rounded).weight(.semibold))
+                .widgetAccentable()
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Уведомления")
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .widgetAccentable()
+                    .lineLimit(1)
+                Text("Открыть центр")
+                    .font(.system(.caption2, design: .rounded))
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var systemSmallLayout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "bell.badge.fill")
+                .font(.title2.weight(.semibold))
+            Text("Уведомления")
+                .font(.headline)
+            Text("Открыть центр")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }

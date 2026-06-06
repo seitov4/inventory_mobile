@@ -102,20 +102,51 @@ private struct QuickSaleWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        if family == .accessoryCircular {
-            Image(systemName: "barcode.viewfinder")
-                .widgetLabel("Продажа")
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: "barcode.viewfinder")
-                    .font(.title2.weight(.semibold))
-                Text("Продажа")
-                    .font(.headline)
-                Text("Открыть сканер")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .containerBackground(.fill.tertiary, for: .widget)
+        switch family {
+        case .accessoryCircular:
+            circularLayout
+        case .accessoryRectangular:
+            rectangularLayout
+        default:
+            systemSmallLayout
         }
+    }
+
+    private var circularLayout: some View {
+        Image(systemName: "barcode.viewfinder")
+            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .widgetAccentable()
+            .widgetLabel("Продажа")
+    }
+
+    private var rectangularLayout: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "barcode.viewfinder")
+                .font(.system(.caption, design: .rounded).weight(.semibold))
+                .widgetAccentable()
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Продажа")
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .widgetAccentable()
+                    .lineLimit(1)
+                Text("Открыть сканер")
+                    .font(.system(.caption2, design: .rounded))
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var systemSmallLayout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "barcode.viewfinder")
+                .font(.title2.weight(.semibold))
+            Text("Продажа")
+                .font(.headline)
+            Text("Открыть сканер")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }

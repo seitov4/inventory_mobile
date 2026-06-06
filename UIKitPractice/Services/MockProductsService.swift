@@ -30,6 +30,20 @@ final class MockProductsService {
             completion(.success(response))
         }
     }
+
+    func fetchProduct(
+        barcode: String,
+        completion: @escaping (Result<Product, Error>) -> Void
+    ) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let trimmedBarcode = barcode.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let product = self.generateMockProducts().first(where: { $0.barcode == trimmedBarcode }) {
+                completion(.success(product))
+            } else {
+                completion(.failure(AppError.notFound))
+            }
+        }
+    }
     
     private func generateMockProducts() -> [Product] {
         return [

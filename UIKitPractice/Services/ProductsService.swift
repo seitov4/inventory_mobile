@@ -12,7 +12,7 @@ private struct BackendProductDTO: Decodable {
     let name: String
     let barcode: String?
     let salePrice: Double
-    let quantity: Int
+    let quantity: Int?
     let category: String?
     let minStock: Int?
 
@@ -32,7 +32,7 @@ private struct BackendProductDTO: Decodable {
         name = try container.decode(String.self, forKey: .name)
         barcode = try container.decodeIfPresent(String.self, forKey: .barcode)
         salePrice = Self.decodeDouble(from: container, forKey: .salePrice) ?? 0
-        quantity = Self.decodeInt(from: container, forKey: .quantity) ?? 0
+        quantity = Self.decodeInt(from: container, forKey: .quantity)
         category = try container.decodeIfPresent(String.self, forKey: .category)
         minStock = Self.decodeInt(from: container, forKey: .minStock)
     }
@@ -69,10 +69,14 @@ private struct BackendProductDTO: Decodable {
             name: name,
             barcode: barcode,
             price: salePrice,
-            quantity: quantity,
+            quantity: quantity ?? 0,
             category: category ?? L10n.tr("products.category_uncategorized"),
             lowStockThreshold: minStock
         )
+    }
+
+    var hasAvailability: Bool {
+        quantity != nil
     }
 }
 
@@ -118,6 +122,60 @@ final class ProductsService {
 
             case .failure(let error):
                 completion(.failure(error))
+            }
+        }
+    }
+
+    func fetchProduct(
+        barcode: String,
+        completion: @escaping (Result<Product, Error>) -> Void
+    ) {
+        let trimmedBarcode = barcode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedBarcode.isEmpty else {
+            completion(.failure(AppError.invalidURL))
+            return
+        }
+
+        let encodedBarcode = trimmedBarcode.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? trimmedBarcode
+
+        APIClient.shared.requestEnvelope(
+            endpoint: "products/barcode/\(encodedBarcode)",
+            method: "GET"
+        ) { [weak self] (result: Result<BackendProductDTO, Error>) in
+            switch result {
+            case .success(let backendProduct):
+                guard backendProduct.hasAvailability else {
+                    self?.fetchProductFromAvailableStock(
+                        barcode: trimmedBarcode,
+                        fallbackProduct: backendProduct.product,
+                        completion: completion
+                    )
+                    return
+                }
+                completion(.success(backendProduct.product))
+
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func fetchProductFromAvailableStock(
+        barcode: String,
+        fallbackProduct: Product,
+        completion: @escaping (Result<Product, Error>) -> Void
+    ) {
+        fetchProducts(category: nil, searchQuery: nil) { result in
+            switch result {
+            case .success(let response):
+                if let product = response.products.first(where: { $0.barcode == barcode }) {
+                    completion(.success(product))
+                } else {
+                    completion(.success(fallbackProduct))
+                }
+
+            case .failure:
+                completion(.success(fallbackProduct))
             }
         }
     }
