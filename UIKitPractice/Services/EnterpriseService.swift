@@ -42,6 +42,39 @@ private struct BackendUserDTO: Decodable {
     }
 }
 
+struct CreateEmployeeRequest: Encodable {
+    let contact: String
+    let firstName: String
+    let lastName: String
+    let role: String
+    let password: String
+
+    private enum CodingKeys: String, CodingKey {
+        case contact
+        case firstName
+        case lastName
+        case role
+        case password
+    }
+}
+
+private struct CreatedUserDTO: Decodable {
+    let user: BackendUserDTO
+
+    private enum CodingKeys: String, CodingKey {
+        case user
+    }
+
+    init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self),
+           let user = try? container.decode(BackendUserDTO.self, forKey: .user) {
+            self.user = user
+        } else {
+            self.user = try BackendUserDTO(from: decoder)
+        }
+    }
+}
+
 final class EnterpriseService {
     static let shared = EnterpriseService()
 
@@ -71,4 +104,39 @@ final class EnterpriseService {
             }
         }
     }
+
+    func createEmployee(
+        request: CreateEmployeeRequest,
+        completion: @escaping (Result<Employee, Error>) -> Void
+    ) {
+        guard let data = try? JSONEncoder().encode(request) else {
+            completion(.failure(AppError.unknown))
+            return
+        }
+
+        APIClient.shared.requestEnvelope(
+            endpoint: "users",
+            method: "POST",
+            body: data
+        ) { (result: Result<CreatedUserDTO, Error>) in
+            completion(result.map { $0.user.employee })
+        }
+    }
+
+    func deleteEmployee(
+        id: Int,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        APIClient.shared.request(
+            endpoint: "users/\(id)",
+            method: "DELETE"
+        ) { (result: Result<DeleteEmployeeResponse, Error>) in
+            completion(result.map { _ in () })
+        }
+    }
+}
+
+private struct DeleteEmployeeResponse: Decodable {
+    let success: Bool
+    let error: String?
 }

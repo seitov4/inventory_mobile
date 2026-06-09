@@ -3,6 +3,8 @@
 "common.cancel" = "Cancel";
 "common.save" = "Save";
 "common.delete" = "Delete";
+"common.error" = "Error";
+"common.success" = "Done";
 "common.done" = "Done";
 
 "tab.analytics" = "Analytics";
@@ -286,6 +288,25 @@
 "enterprise.employee.owner" = "Owner";
 "enterprise.employee.cashier" = "Cashier";
 "enterprise.employee.admin" = "Administrator";
+"enterprise.employee.manager" = "Manager";
+"enterprise.employee.staff" = "Staff";
+"enterprise.my_enterprise" = "My enterprise";
+"enterprise.employees" = "Employees";
+"enterprise.employee.add" = "Add employee";
+"enterprise.employee.created" = "Employee added";
+"enterprise.employee.deleted" = "Employee deleted";
+"enterprise.employee.delete_title" = "Delete employee?";
+"enterprise.employee.personal_data" = "Personal data";
+"enterprise.employee.first_name" = "First name";
+"enterprise.employee.last_name" = "Last name";
+"enterprise.employee.access" = "Access";
+"enterprise.employee.role" = "Role";
+"enterprise.employee.temp_password" = "Temporary password";
+"enterprise.employee.password_hint" = "Minimum 6 characters. The employee can sign in with this password.";
+"enterprise.employee.management_title" = "Employee management";
+"enterprise.employee.management_subtitle" = "Add employees, assign roles, and control access.";
+"enterprise.employee.total_format" = "Total: %lld";
+"enterprise.employee.active_format" = "Active: %lld";
 
 "personal.name" = "Name";
 "personal.surname" = "Surname";

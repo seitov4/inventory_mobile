@@ -3,6 +3,8 @@
 "common.cancel" = "Болдырмау";
 "common.save" = "Сақтау";
 "common.delete" = "Жою";
+"common.error" = "Қате";
+"common.success" = "Дайын";
 "common.done" = "Дайын";
 
 "tab.analytics" = "Аналитика";
@@ -286,6 +288,25 @@
 "enterprise.employee.owner" = "Иесі";
 "enterprise.employee.cashier" = "Кассир";
 "enterprise.employee.admin" = "Әкімші";
+"enterprise.employee.manager" = "Менеджер";
+"enterprise.employee.staff" = "Қызметкер";
+"enterprise.my_enterprise" = "Менің кәсіпорным";
+"enterprise.employees" = "Қызметкерлер";
+"enterprise.employee.add" = "Қызметкер қосу";
+"enterprise.employee.created" = "Қызметкер қосылды";
+"enterprise.employee.deleted" = "Қызметкер жойылды";
+"enterprise.employee.delete_title" = "Қызметкерді жою?";
+"enterprise.employee.personal_data" = "Жеке деректер";
+"enterprise.employee.first_name" = "Аты";
+"enterprise.employee.last_name" = "Тегі";
+"enterprise.employee.access" = "Қолжетімділік";
+"enterprise.employee.role" = "Рөл";
+"enterprise.employee.temp_password" = "Уақытша құпиясөз";
+"enterprise.employee.password_hint" = "Кемінде 6 таңба. Қызметкер осы құпиясөзбен кіре алады.";
+"enterprise.employee.management_title" = "Қызметкерлерді басқару";
+"enterprise.employee.management_subtitle" = "Қызметкерлерді қосып, рөлдер тағайындап, қолжетімділікті бақылаңыз.";
+"enterprise.employee.total_format" = "Барлығы: %lld";
+"enterprise.employee.active_format" = "Белсенді: %lld";
 
 "personal.name" = "Аты";
 "personal.surname" = "Тегі";

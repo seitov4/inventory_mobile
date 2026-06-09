@@ -3,6 +3,8 @@
 "common.cancel" = "Отмена";
 "common.save" = "Сохранить";
 "common.delete" = "Удалить";
+"common.error" = "Ошибка";
+"common.success" = "Готово";
 "common.done" = "Готово";
 
 "tab.analytics" = "Аналитика";
@@ -286,6 +288,25 @@
 "enterprise.employee.owner" = "Владелец";
 "enterprise.employee.cashier" = "Кассир";
 "enterprise.employee.admin" = "Администратор";
+"enterprise.employee.manager" = "Менеджер";
+"enterprise.employee.staff" = "Сотрудник";
+"enterprise.my_enterprise" = "Моё предприятие";
+"enterprise.employees" = "Сотрудники";
+"enterprise.employee.add" = "Добавить сотрудника";
+"enterprise.employee.created" = "Сотрудник добавлен";
+"enterprise.employee.deleted" = "Сотрудник удалён";
+"enterprise.employee.delete_title" = "Удалить сотрудника?";
+"enterprise.employee.personal_data" = "Личные данные";
+"enterprise.employee.first_name" = "Имя";
+"enterprise.employee.last_name" = "Фамилия";
+"enterprise.employee.access" = "Доступ";
+"enterprise.employee.role" = "Роль";
+"enterprise.employee.temp_password" = "Временный пароль";
+"enterprise.employee.password_hint" = "Минимум 6 символов. Сотрудник сможет войти с этим паролем.";
+"enterprise.employee.management_title" = "Управление сотрудниками";
+"enterprise.employee.management_subtitle" = "Добавляйте сотрудников, назначайте роли и контролируйте доступ.";
+"enterprise.employee.total_format" = "Всего: %lld";
+"enterprise.employee.active_format" = "Активных: %lld";
 
 "personal.name" = "Имя";
 "personal.surname" = "Фамилия";
