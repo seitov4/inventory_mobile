@@ -11,6 +11,7 @@ import UIKit
 struct AnalyticsScreen: View {
     @Bindable var viewModel: AnalyticsViewModel
     let onOpenAIChat: () -> Void
+    let onOpenReports: () -> Void
     @Environment(\.colorScheme) private var colorScheme
     @State private var isBannerVisible = false
     @State private var isReorderPlanPresented = false
@@ -21,6 +22,10 @@ struct AnalyticsScreen: View {
                 analyticsHeader
 
                 aiPromoBanner
+                    .opacity(isBannerVisible ? 1 : 0)
+                    .offset(y: isBannerVisible ? 0 : 8)
+
+                reportsEntryCard
                     .opacity(isBannerVisible ? 1 : 0)
                     .offset(y: isBannerVisible ? 0 : 8)
 
@@ -307,6 +312,73 @@ struct AnalyticsScreen: View {
             .padding(18)
         }
         .frame(height: 155)
+    }
+
+    private var reportsEntryCard: some View {
+        Button(action: onOpenReports) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(ReportsBannerPalette.gradient)
+                    .shadow(color: ReportsBannerPalette.shadow.opacity(colorScheme == .dark ? 0.22 : 0.28), radius: 16, y: 8)
+
+                Circle()
+                    .fill(.white.opacity(0.10))
+                    .frame(width: 120, height: 120)
+                    .offset(x: 148, y: -54)
+
+                Image(systemName: "chart.bar.doc.horizontal")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.28))
+                    .offset(x: 146, y: 50)
+
+                HStack(spacing: 14) {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(.white.opacity(0.18))
+                        .frame(width: 64, height: 64)
+                        .overlay {
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .font(.system(size: 29, weight: .semibold))
+                                .foregroundStyle(.white)
+                        }
+
+                    VStack(alignment: .leading, spacing: 9) {
+                        HStack(spacing: 7) {
+                            Circle()
+                                .fill(.white.opacity(0.9))
+                                .frame(width: 6, height: 6)
+                            Text(L10n.tr("reports.banner.badge"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.white.opacity(0.96))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.white.opacity(0.14), in: Capsule())
+
+                        Text(L10n.tr("reports.owner_title"))
+                            .font(.title3.bold())
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+
+                        Text(L10n.tr("reports.analytics_banner_subtitle"))
+                            .font(.footnote)
+                            .foregroundStyle(.white.opacity(0.88))
+                            .lineLimit(2)
+                    }
+                    .layoutPriority(1)
+
+                    Spacer(minLength: 8)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.88))
+                        .frame(width: 42, height: 42)
+                        .background(.white.opacity(0.13), in: Circle())
+                }
+                .padding(18)
+            }
+            .frame(height: 128)
+        }
+        .buttonStyle(ReportsBannerButtonStyle())
     }
 
     private var metricsRow: some View {
@@ -694,4 +766,26 @@ enum AnalyticsAIPalette {
         startPoint: .leading,
         endPoint: .trailing
     )
+}
+
+enum ReportsBannerPalette {
+    static let gradient = LinearGradient(
+        colors: [
+            Color(.systemTeal),
+            Color(.systemGreen),
+            Color(.systemBlue).opacity(0.82)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let shadow = Color(.systemTeal)
+}
+
+struct ReportsBannerButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    }
 }

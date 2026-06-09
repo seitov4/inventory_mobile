@@ -26,9 +26,11 @@ final class AnalyticsViewController: UIViewController {
         navigationItem.title = ""
         navigationItem.largeTitleDisplayMode = .never
 
-        let root = AnalyticsScreen(viewModel: viewModel) { [weak self] in
-            self?.openAIChat()
-        }
+        let root = AnalyticsScreen(
+            viewModel: viewModel,
+            onOpenAIChat: { [weak self] in self?.openAIChat() },
+            onOpenReports: { [weak self] in self?.openReports() }
+        )
         let host = UIHostingController(rootView: root)
         host.view.backgroundColor = .clear
         hostingController = host
@@ -51,6 +53,12 @@ final class AnalyticsViewController: UIViewController {
         ])
         let chat = AIChatScreen(viewModel: AIChatViewModel(service: MockAIChatService()))
         let vc = UIHostingController(rootView: chat)
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func openReports() {
+        let vc = UIHostingController(rootView: ReportsScreen())
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }

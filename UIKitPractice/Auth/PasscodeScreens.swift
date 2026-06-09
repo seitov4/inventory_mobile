@@ -154,6 +154,7 @@ final class PasscodeUnlockViewModel: ObservableObject {
     @Published var isBiometricsInProgress: Bool = false
     @Published var failedAttempts: Int = 0
     @Published var shakeTrigger: Int = 0
+    @Published var showForgotPasscodeAlert: Bool = false
 
     private let authManager: AuthManager
     private var isEvaluating: Bool = false
@@ -213,6 +214,23 @@ final class PasscodeUnlockViewModel: ObservableObject {
             }
         }
     }
+
+    func forgotPasscode() {
+        showForgotPasscodeAlert = true
+    }
+
+    func confirmForgotPasscode(onLockout: @escaping () -> Void) {
+        code = ""
+        failedAttempts = 0
+        KeychainManager.shared.deleteToken()
+        UserSessionManager.shared.clear()
+        authManager.clearPasscode()
+        authManager.setBiometricsEnabled(false)
+        AppAnalytics.shared.track(.logout, properties: [
+            "source": "forgot_passcode"
+        ])
+        onLockout()
+    }
 }
 
 struct PasscodeUnlockScreen: View {
@@ -250,10 +268,28 @@ struct PasscodeUnlockScreen: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
 
+            Button {
+                viewModel.forgotPasscode()
+            } label: {
+                Text(L10n.tr("auth.forgot_passcode"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.accentColor)
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 2)
+
             Spacer(minLength: 0)
         }
         .background(Color(.systemBackground))
         .onAppear { viewModel.tryBiometrics(onUnlocked: onUnlocked) }
+        .alert(L10n.tr("auth.forgot_passcode_alert_title"), isPresented: $viewModel.showForgotPasscodeAlert) {
+            Button(L10n.tr("common.no"), role: .cancel) {}
+            Button(L10n.tr("common.yes"), role: .destructive) {
+                viewModel.confirmForgotPasscode(onLockout: onLockout)
+            }
+        } message: {
+            Text(L10n.tr("auth.forgot_passcode_alert_message"))
+        }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
         .appLocalized()
     }

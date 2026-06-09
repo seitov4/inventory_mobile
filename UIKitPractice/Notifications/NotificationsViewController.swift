@@ -27,7 +27,9 @@ final class NotificationsViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .always
         NotificationCenter.default.addObserver(self, selector: #selector(languageDidChange), name: .appLanguageDidChange, object: nil)
 
-        let root = NotificationsScreen(viewModel: viewModel)
+        let root = NotificationsScreen(viewModel: viewModel) { [weak self] in
+            self?.openReports()
+        }
         let host = UIHostingController(rootView: root)
         host.view.backgroundColor = .clear
         hostingController = host
@@ -60,5 +62,11 @@ final class NotificationsViewController: UIViewController {
             target: self,
             action: #selector(markAllReadTapped)
         )
+    }
+
+    private func openReports() {
+        let vc = UIHostingController(rootView: ReportsScreen())
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
