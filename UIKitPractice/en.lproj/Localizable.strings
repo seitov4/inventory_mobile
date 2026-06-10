@@ -323,6 +323,8 @@
 "support.email" = "Write an email";
 "support.telegram" = "Message on Telegram";
 "support.hours" = "Fast replies • 9:00–21:00 • Every day";
+"support.section_title" = "Help";
+"support.profile_subtitle" = "Phone, email, and Telegram";
 "welcome.subtitle" = "Sign in or register";
 "auth.password_show" = "Show password";
 "auth.password_hide" = "Hide password";

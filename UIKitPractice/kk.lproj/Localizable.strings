@@ -323,6 +323,8 @@
 "support.email" = "Хат жазу";
 "support.telegram" = "Telegram арқылы жазу";
 "support.hours" = "Жылдам жауап береміз • 9:00–21:00 • Күн сайын";
+"support.section_title" = "Көмек";
+"support.profile_subtitle" = "Телефон, пошта және Telegram";
 "welcome.subtitle" = "Кіру немесе тіркелу";
 "auth.password_show" = "Құпиясөзді көрсету";
 "auth.password_hide" = "Құпиясөзді жасыру";

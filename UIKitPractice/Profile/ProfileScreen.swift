@@ -143,6 +143,7 @@ struct ProfileScreen: View {
     let onPersonalDataTap: () -> Void
     let onSettingsTap: () -> Void
     let onChangePasswordTap: () -> Void
+    let onSupportTap: () -> Void
     let onLogoutTap: () -> Void
 
     @State private var hasAppeared = false
@@ -235,6 +236,18 @@ struct ProfileScreen: View {
                 .padding(.horizontal, 16)
                 .profileAppear(index: 3, active: hasAppeared)
 
+                ProfileGroupedCard(title: L10n.tr("support.section_title")) {
+                    ProfileActionRow(
+                        icon: "questionmark.bubble.fill",
+                        title: L10n.tr("support.title"),
+                        value: L10n.tr("support.profile_subtitle"),
+                        showsChevron: true,
+                        action: onSupportTap
+                    )
+                }
+                .padding(.horizontal, 16)
+                .profileAppear(index: 4, active: hasAppeared)
+
                 Button(action: onLogoutTap) {
                     Label(L10n.tr("Выйти из аккаунта"), systemImage: "rectangle.portrait.and.arrow.right")
                         .font(.system(size: 17, weight: .semibold))
@@ -244,7 +257,7 @@ struct ProfileScreen: View {
                 .buttonStyle(ProfileDestructiveButtonStyle())
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
-                .profileAppear(index: 4, active: hasAppeared)
+                .profileAppear(index: 5, active: hasAppeared)
             }
             .padding(.top, 12)
             .padding(.bottom, 36)

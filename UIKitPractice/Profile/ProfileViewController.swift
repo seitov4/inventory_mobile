@@ -37,6 +37,7 @@ final class ProfileViewController: UIViewController {
             onPersonalDataTap: { [weak self] in self?.onShowProfileDetails?() },
             onSettingsTap: { [weak self] in self?.onShowSettings?() },
             onChangePasswordTap: { [weak self] in self?.onShowPasscodeChange?() },
+            onSupportTap: { [weak self] in self?.onShowSupport?() },
             onLogoutTap: { [weak self] in self?.showLogoutAlert() }
         )
 
