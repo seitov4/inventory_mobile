@@ -117,6 +117,7 @@ private struct QuickSaleWidgetView: View {
             .font(.system(.title3, design: .rounded).weight(.semibold))
             .widgetAccentable()
             .widgetLabel("Продажа")
+            .containerBackground(Color.clear, for: .widget)
     }
 
     private var rectangularLayout: some View {
@@ -135,6 +136,7 @@ private struct QuickSaleWidgetView: View {
                     .lineLimit(1)
             }
         }
+        .containerBackground(Color.clear, for: .widget)
     }
 
     private var systemSmallLayout: some View {

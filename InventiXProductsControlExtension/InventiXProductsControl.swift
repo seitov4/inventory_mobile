@@ -111,6 +111,7 @@ private struct ProductsWidgetView: View {
             .font(.system(.title3, design: .rounded).weight(.semibold))
             .widgetAccentable()
             .widgetLabel("Товары")
+            .containerBackground(Color.clear, for: .widget)
     }
 
     private var rectangularLayout: some View {
@@ -129,6 +130,7 @@ private struct ProductsWidgetView: View {
                     .lineLimit(1)
             }
         }
+        .containerBackground(Color.clear, for: .widget)
     }
 
     private var systemSmallLayout: some View {

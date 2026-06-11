@@ -2,6 +2,7 @@ import Foundation
 
 enum AppShortcutRoute: String {
     case analytics = "com.inventix.shortcut.analytics"
+    case aiChat = "com.inventix.shortcut.aiChat"
     case products = "com.inventix.shortcut.products"
     case quickSale = "com.inventix.shortcut.quickSale"
     case myEnterprise = "com.inventix.shortcut.myEnterprise"
@@ -21,6 +22,8 @@ enum AppShortcutRoute: String {
         switch identifier {
         case "analytics":
             self = .analytics
+        case "ai-chat", "aiChat", "chat", "assistant", "ai-assistant":
+            self = .aiChat
         case "products":
             self = .products
         case "sales", "sale", "quick-sale", "quickSale":

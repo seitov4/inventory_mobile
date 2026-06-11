@@ -134,6 +134,13 @@ final class MainCoordinator: NSObject, Coordinator {
         case .analytics:
             guard selectTab(.analytics) else { return false }
             analyticsNavController?.popToRootViewController(animated: false)
+        case .aiChat:
+            guard selectTab(.analytics) else { return false }
+            analyticsNavController?.popToRootViewController(animated: false)
+            let chat = AIChatView()
+            let vc = UIHostingController(rootView: chat)
+            vc.hidesBottomBarWhenPushed = true
+            analyticsNavController?.pushViewController(vc, animated: false)
         case .products:
             guard selectTab(.products) else { return false }
             productsNavController?.popToRootViewController(animated: false)

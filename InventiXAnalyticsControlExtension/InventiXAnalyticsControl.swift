@@ -12,6 +12,7 @@ import WidgetKit
 struct InventiXAnalyticsBundle: WidgetBundle {
     var body: some Widget {
         InventiXAnalyticsWidget()
+        InventiXAIChatWidget()
         InventiXAnalyticsControl()
     }
 }
@@ -111,6 +112,7 @@ private struct AnalyticsWidgetView: View {
             .font(.system(.title3, design: .rounded).weight(.semibold))
             .widgetAccentable()
             .widgetLabel("Аналитика")
+            .containerBackground(Color.clear, for: .widget)
     }
 
     private var rectangularLayout: some View {
@@ -129,6 +131,7 @@ private struct AnalyticsWidgetView: View {
                     .lineLimit(1)
             }
         }
+        .containerBackground(Color.clear, for: .widget)
     }
 
     private var systemSmallLayout: some View {
@@ -138,6 +141,85 @@ private struct AnalyticsWidgetView: View {
             Text("Аналитика")
                 .font(.headline)
             Text("Открыть отчеты")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
+    }
+}
+
+struct InventiXAIChatWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "com.inventix.widgets.aiChat", provider: AIChatWidgetProvider()) { _ in
+            AIChatWidgetView()
+                .widgetURL(URL(string: "inventix://ai-chat"))
+        }
+        .configurationDisplayName("AI чат")
+        .description("Открыть AI ассистента InventiX")
+        .supportedFamilies([.accessoryCircular, .accessoryRectangular, .systemSmall])
+    }
+}
+
+private struct AIChatWidgetProvider: TimelineProvider {
+    func placeholder(in context: Context) -> AIChatWidgetEntry { AIChatWidgetEntry(date: Date()) }
+    func getSnapshot(in context: Context, completion: @escaping (AIChatWidgetEntry) -> Void) { completion(AIChatWidgetEntry(date: Date())) }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<AIChatWidgetEntry>) -> Void) {
+        completion(Timeline(entries: [AIChatWidgetEntry(date: Date())], policy: .never))
+    }
+}
+
+private struct AIChatWidgetEntry: TimelineEntry {
+    let date: Date
+}
+
+private struct AIChatWidgetView: View {
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            circularLayout
+        case .accessoryRectangular:
+            rectangularLayout
+        default:
+            systemSmallLayout
+        }
+    }
+
+    private var circularLayout: some View {
+        Image(systemName: "message.fill")
+            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .widgetAccentable()
+            .widgetLabel("AI чат")
+            .containerBackground(Color.clear, for: .widget)
+    }
+
+    private var rectangularLayout: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "message.fill")
+                .font(.system(.caption, design: .rounded).weight(.semibold))
+                .widgetAccentable()
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("AI чат")
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .widgetAccentable()
+                    .lineLimit(1)
+                Text("Открыть ассистента")
+                    .font(.system(.caption2, design: .rounded))
+                    .lineLimit(1)
+            }
+        }
+        .containerBackground(Color.clear, for: .widget)
+    }
+
+    private var systemSmallLayout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "message.fill")
+                .font(.title2.weight(.semibold))
+            Text("AI чат")
+                .font(.headline)
+            Text("Открыть ассистента")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
