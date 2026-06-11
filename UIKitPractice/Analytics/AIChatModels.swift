@@ -28,7 +28,7 @@ struct AIChatData: Decodable {
     }
 }
 
-struct AIChatMessage: Identifiable, Equatable {
+struct AIChatMessage: Identifiable, Equatable, Codable {
     let id: UUID
     let role: AIChatRole
     let content: String
@@ -47,7 +47,32 @@ struct AIChatMessage: Identifiable, Equatable {
     }
 }
 
-enum AIChatRole: Equatable {
+enum AIChatRole: String, Equatable, Codable {
     case user
     case assistant
+}
+
+struct AIChatConversation: Identifiable, Equatable, Codable {
+    let id: UUID
+    var title: String
+    var messages: [AIChatMessage]
+    var backendConversationId: String?
+    let createdAt: Date
+    var updatedAt: Date
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        messages: [AIChatMessage],
+        backendConversationId: String? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.title = title
+        self.messages = messages
+        self.backendConversationId = backendConversationId
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 }

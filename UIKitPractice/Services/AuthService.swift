@@ -81,7 +81,7 @@ final class AuthService {
             switch result {
             case .success(let auth):
                 KeychainManager.shared.saveToken(auth.token)
-                UserSessionManager.shared.updateRole(fromBackend: auth.user.role)
+                UserSessionManager.shared.updateUser(id: auth.user.id, role: auth.user.role)
                 completion(.success(auth.user))
             case .failure(let error):
                 completion(.failure(error))
@@ -101,7 +101,7 @@ final class AuthService {
         ) { (result: Result<MePayload, Error>) in
             switch result {
             case .success(let payload):
-                UserSessionManager.shared.updateRole(fromBackend: payload.user.role)
+                UserSessionManager.shared.updateUser(id: payload.user.id, role: payload.user.role)
                 completion(.success(payload.user))
             case .failure(let error):
                 completion(.failure(error))

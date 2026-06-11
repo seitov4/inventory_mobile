@@ -209,6 +209,13 @@
 "analytics.chart.amount" = "Сома";
 "analytics.categories.subtitle" = "Түсім үлесі";
 "analytics.ai.title" = "AI көмекші";
+"analytics.ai.history" = "Чаттар тарихы";
+"analytics.ai.new_chat" = "Жаңа чат";
+"analytics.ai.delete_chat" = "Жою";
+"analytics.ai.close" = "Жабу";
+"analytics.ai.empty_chat" = "Жаңа диалог";
+"analytics.ai.history_load_error" = "Чаттар тарихын жүктеу мүмкін болмады.";
+"analytics.ai.history_save_error" = "Чат тарихын сақтау мүмкін болмады.";
 "analytics.ai.greeting" = "Сәлеметсіз бе. Дүкеннің сатылымдары, қорлары, тауарлары, есептері және сатып алу ұсыныстары туралы деректерді түсінуге көмектесемін.";
 "analytics.ai.send" = "Хабарлама жіберу";
 "analytics.ai.thinking" = "Жауап дайындалуда...";

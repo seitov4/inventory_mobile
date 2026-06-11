@@ -5,6 +5,7 @@ struct AIChatView: View {
     @StateObject private var viewModel: AIChatViewModel
     @FocusState private var isInputFocused: Bool
     @State private var hasAppeared = false
+    @State private var isHistoryPresented = false
 
     init() {
         _viewModel = StateObject(wrappedValue: AIChatViewModel())
@@ -23,6 +24,29 @@ struct AIChatView: View {
         .background(Color(.systemBackground))
         .navigationTitle(L10n.tr("analytics.ai.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    isInputFocused = false
+                    isHistoryPresented = true
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                }
+                .accessibilityLabel(L10n.tr("analytics.ai.history"))
+
+                Button {
+                    isInputFocused = false
+                    viewModel.createNewConversation()
+                } label: {
+                    Image(systemName: "square.and.pencil")
+                }
+                .disabled(viewModel.isLoading)
+                .accessibilityLabel(L10n.tr("analytics.ai.new_chat"))
+            }
+        }
+        .sheet(isPresented: $isHistoryPresented) {
+            AIChatHistoryView(viewModel: viewModel, isPresented: $isHistoryPresented)
+        }
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) {
                 hasAppeared = true
@@ -212,6 +236,110 @@ struct AIChatView: View {
                 proxy.scrollTo(lastMessage.id, anchor: .bottom)
             }
         }
+    }
+}
+
+private struct AIChatHistoryView: View {
+    @ObservedObject var viewModel: AIChatViewModel
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(viewModel.conversations) { conversation in
+                    Button {
+                        viewModel.selectConversation(conversation.id)
+                        isPresented = false
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "message.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(aiTint)
+                                .frame(width: 36, height: 36)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .fill(aiTint.opacity(0.10))
+                                )
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(conversation.title)
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Color.primary)
+                                    .lineLimit(1)
+
+                                Text(previewText(for: conversation))
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Color.secondary)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer(minLength: 8)
+
+                            VStack(alignment: .trailing, spacing: 6) {
+                                Text(relativeDate(conversation.updatedAt))
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(Color.secondary)
+
+                                if viewModel.selectedConversationId == conversation.id {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundStyle(aiTint)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .buttonStyle(.plain)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            viewModel.deleteConversation(conversation.id)
+                        } label: {
+                            Label(L10n.tr("analytics.ai.delete_chat"), systemImage: "trash")
+                        }
+                        .disabled(viewModel.isLoading)
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle(L10n.tr("analytics.ai.history"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(L10n.tr("analytics.ai.close")) {
+                        isPresented = false
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        viewModel.createNewConversation()
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .disabled(viewModel.isLoading)
+                    .accessibilityLabel(L10n.tr("analytics.ai.new_chat"))
+                }
+            }
+        }
+    }
+
+    private var aiTint: Color {
+        Color(red: 110 / 255, green: 71 / 255, blue: 232 / 255)
+    }
+
+    private func previewText(for conversation: AIChatConversation) -> String {
+        conversation.messages
+            .last(where: { $0.role == .user })?
+            .content
+            .replacingOccurrences(of: "\n", with: " ")
+            ?? L10n.tr("analytics.ai.empty_chat")
+    }
+
+    private func relativeDate(_ date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

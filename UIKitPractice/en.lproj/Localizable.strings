@@ -209,6 +209,13 @@
 "analytics.chart.amount" = "Amount";
 "analytics.categories.subtitle" = "Revenue share";
 "analytics.ai.title" = "AI Assistant";
+"analytics.ai.history" = "Chat history";
+"analytics.ai.new_chat" = "New chat";
+"analytics.ai.delete_chat" = "Delete";
+"analytics.ai.close" = "Close";
+"analytics.ai.empty_chat" = "New conversation";
+"analytics.ai.history_load_error" = "Could not load chat history.";
+"analytics.ai.history_save_error" = "Could not save chat history.";
 "analytics.ai.greeting" = "Hello. I can help you understand your store data, including sales, stock levels, products, reports, and restocking recommendations.";
 "analytics.ai.send" = "Send message";
 "analytics.ai.thinking" = "Thinking...";

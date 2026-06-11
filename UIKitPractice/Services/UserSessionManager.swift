@@ -96,6 +96,7 @@ final class UserSessionManager {
     static let shared = UserSessionManager()
 
     private let roleKey = "app_user_role"
+    private let userIdentifierKey = "app_user_identifier"
 
     private init() {}
 
@@ -124,12 +125,27 @@ final class UserSessionManager {
         currentRole = AppUserRole.fromBackendRole(rawRole)
     }
 
+    var currentUserIdentifier: String {
+        UserDefaults.standard.string(forKey: userIdentifierKey) ?? "anonymous"
+    }
+
+    func updateUser(id: Int, role rawRole: String) {
+        UserDefaults.standard.set(String(id), forKey: userIdentifierKey)
+        updateRole(fromBackend: rawRole)
+    }
+
     func ensureMockRoleIfNeeded() {
         guard UserDefaults.standard.string(forKey: roleKey) == nil else { return }
         currentRole = .owner
     }
 
+    func setMockUserIfNeeded() {
+        UserDefaults.standard.set("mock-user", forKey: userIdentifierKey)
+        ensureMockRoleIfNeeded()
+    }
+
     func clear() {
         UserDefaults.standard.removeObject(forKey: roleKey)
+        UserDefaults.standard.removeObject(forKey: userIdentifierKey)
     }
 }

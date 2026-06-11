@@ -209,6 +209,13 @@
 "analytics.chart.amount" = "Сумма";
 "analytics.categories.subtitle" = "Доля выручки";
 "analytics.ai.title" = "AI Помощник";
+"analytics.ai.history" = "История чатов";
+"analytics.ai.new_chat" = "Новый чат";
+"analytics.ai.delete_chat" = "Удалить";
+"analytics.ai.close" = "Закрыть";
+"analytics.ai.empty_chat" = "Новый диалог";
+"analytics.ai.history_load_error" = "Не удалось загрузить историю чатов.";
+"analytics.ai.history_save_error" = "Не удалось сохранить историю чата.";
 "analytics.ai.greeting" = "Здравствуйте. Я помогу разобраться в данных магазина: продажах, остатках, товарах, отчётах и рекомендациях по закупкам.";
 "analytics.ai.send" = "Отправить сообщение";
 "analytics.ai.thinking" = "Формирую ответ...";
