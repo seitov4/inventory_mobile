@@ -75,9 +75,6 @@ final class APIClient {
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
             print("❌ JSON decode error: \(error.localizedDescription)")
-            if let responseStr = String(data: data, encoding: .utf8) {
-                print("🔹 Response body: \(responseStr)")
-            }
             throw AppError.decoding
         }
     }
@@ -123,9 +120,6 @@ final class APIClient {
                 self.complete(completion, with: .success(decoded))
             } catch {
                 print("❌ JSON decode error: \(error.localizedDescription)")
-                if let responseStr = String(data: data, encoding: .utf8) {
-                    print("🔹 Response body: \(responseStr)")
-                }
                 self.complete(completion, with: .failure(AppError.decoding))
             }
         }.resume()
@@ -185,9 +179,6 @@ final class APIClient {
                 self.complete(completion, with: .success(data))
             } catch {
                 print("❌ JSON decode error: \(error.localizedDescription)")
-                if let responseStr = String(data: data, encoding: .utf8) {
-                    print("🔹 Response body: \(responseStr)")
-                }
                 self.complete(completion, with: .failure(AppError.decoding))
             }
         }.resume()

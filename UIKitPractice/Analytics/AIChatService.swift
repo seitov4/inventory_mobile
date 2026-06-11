@@ -1,43 +1,65 @@
 import Foundation
 
-struct AIChatTurn: Codable {
-    let role: String
-    let content: String
-}
-
 protocol AIChatServiceProtocol {
-    func generateReply(history: [AIChatTurn], userInput: String) async throws -> String
+    func sendMessage(_ message: String, conversationId: String?) async throws -> AIChatData
 }
 
-final class MockAIChatService: AIChatServiceProtocol {
-    func generateReply(history: [AIChatTurn], userInput: String) async throws -> String {
-        try await Task.sleep(nanoseconds: 900_000_000)
+enum AIChatServiceError: Error {
+    case invalidMessage
+    case unauthorized
+    case forbidden
+    case rateLimited
+    case unavailable
+}
 
-        let lower = userInput.lowercased()
-        if lower.contains("продаж") || lower.contains("выручк") {
-            return L10n.tr("analytics.ai.reply.sales")
-        }
-        if lower.contains("спрос") || lower.contains("прогноз") {
-            return L10n.tr("analytics.ai.reply.demand")
-        }
-        if lower.contains("сотрудник") || lower.contains("касс") {
-            return L10n.tr("analytics.ai.reply.staff")
-        }
-        return L10n.tr("analytics.ai.reply.default")
+final class AIChatService: AIChatServiceProtocol {
+    private let apiClient: APIClient
+
+    init(apiClient: APIClient = .shared) {
+        self.apiClient = apiClient
     }
-}
 
-final class RemoteAIChatService: AIChatServiceProtocol {
-    func generateReply(history: [AIChatTurn], userInput: String) async throws -> String {
-        // TODO: Connect AI API
-        // Example approach:
-        // 1) Prepare body with conversation history + userInput.
-        // 2) Send request to backend AI endpoint (e.g. POST /ai/chat).
-        // 3) Decode and return assistant reply text.
-        throw NSError(
-            domain: "RemoteAIChatService",
-            code: -1,
-            userInfo: [NSLocalizedDescriptionKey: "AI API is not connected yet."]
-        )
+    func sendMessage(_ message: String, conversationId: String?) async throws -> AIChatData {
+        let request = AIChatRequest(message: message, conversationId: conversationId)
+
+        do {
+            let response: AIChatResponse = try await apiClient.request(
+                endpoint: "ai/chat",
+                method: "POST",
+                body: request
+            )
+
+            guard response.success, let data = response.data else {
+                throw AIChatServiceError.unavailable
+            }
+
+            return data
+        } catch let error as AIChatServiceError {
+            throw error
+        } catch let error as AppError {
+            switch error {
+            case .unauthorized:
+                throw AIChatServiceError.unauthorized
+            case .forbidden:
+                throw AIChatServiceError.forbidden
+            case .server(let statusCode, _):
+                switch statusCode {
+                case 400:
+                    throw AIChatServiceError.invalidMessage
+                case 401:
+                    throw AIChatServiceError.unauthorized
+                case 403:
+                    throw AIChatServiceError.forbidden
+                case 429:
+                    throw AIChatServiceError.rateLimited
+                default:
+                    throw AIChatServiceError.unavailable
+                }
+            default:
+                throw AIChatServiceError.unavailable
+            }
+        } catch {
+            throw AIChatServiceError.unavailable
+        }
     }
 }
